@@ -1,12 +1,10 @@
 
 import streamlit as st
-import pickle
 import pandas as pd
 import os
 from xgboost import XGBRegressor, Booster
 import xgboost as xgb
 import numpy as np
-import joblib
 
 filepath = os.path.abspath("model/X_test_tx.csv")
 modelpath = os.path.abspath("model/test3.sav")
@@ -23,7 +21,7 @@ model.load_model("model/test.json")
 st.write("This is our model:")
 st.write(type(model))
 ## enter input as boxes ideally but can just use one line of our data first
-# X_test = pd.read_csv(filepath)
+X_test = pd.read_csv(filepath)
 st.write("A random row from our X_test_transform")
 st.write("(Maybe we should do PCA on the data anyway to cover up the numbers and\
          keep the data unreadable even if leaked?)")
