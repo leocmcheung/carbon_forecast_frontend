@@ -21,7 +21,7 @@ model.load_model("model/test.json")
 st.write("This is our model:")
 st.write(type(model))
 ## enter input as boxes ideally but can just use one line of our data first
-X_test = pd.read_csv(filepath)
+# X_test = pd.read_csv(filepath)
 st.write("A random row from our X_test_transform")
 st.write("(Maybe we should do PCA on the data anyway to cover up the numbers and\
          keep the data unreadable even if leaked?)")
