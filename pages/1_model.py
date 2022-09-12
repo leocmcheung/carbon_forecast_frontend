@@ -4,10 +4,13 @@ import pandas as pd
 import os
 from xgboost import XGBRegressor
 import numpy as np
+import joblib
 
-filepath = os.path.abspath("model/X_test_tx.csv")
-modelpath = os.path.abspath("model/test3.sav")
-ypath = os.path.abspath("model/y_test.csv")
+# filepath = os.path.abspath("model/X_test_tx.csv")
+# modelpath = os.path.abspath("model/test3.sav")
+# ypath = os.path.abspath("model/y_test.csv")
+txpath = os.path.abspath("model/tx.pkl")
+modelpath = os.path.abspath("model/test.json")
 st.title("Predict how much annual carbon emission your company has")
 
 ## load pickle
@@ -15,15 +18,26 @@ st.title("Predict how much annual carbon emission your company has")
 # with open(modelpath,"rb") as f:
 #     loaded = Booster.load_model(f)
 model = XGBRegressor()
-model.load_model("model/test.json")
+model.load_model(modelpath)
 # loaded = joblib.load(modelpath)
 # st.write("This is our model:")
 # st.write(type(model))
 ## enter input as boxes ideally but can just use one line of our data first
 # X_test = pd.read_csv(filepath)
-# st.write("A random row from our X_test_transform")
-st.write("(Maybe we should do PCA on the data anyway to cover up the numbers and\
-         keep the data unreadable even if leaked?)")
+
+sector = st.selectbox("Select company sector:",
+        ('','Communication Services',
+ 'Consumer Discretionary',
+ 'Consumer Staples',
+ 'Energy',
+ 'Financials',
+ 'Health Care',
+ 'Industrials',
+ 'Information Technology',
+ 'Materials',
+ 'Real Estate',
+ 'Utilities'))
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -40,19 +54,39 @@ with col3:
     st.write('Enterprise Value is ', round(ev,0))
 
 with col1:
-    c_score = st.number_input('Insert Climate Strategy Score')
-    st.write('CS Score is ', round(ev,0))
+    c_score = st.slider('Select Climate Strategy Score', 0, 100, 50)
+    st.write('CS Score is ', round(c_score,0))
 
 with col2:
-    disclosure = st.number_input('Insert % of Emission Disclosures')
+    disclosure = st.slider('Insert % of Emission Disclosures', 0,100,50)
     st.write('% Disclosures is ', round(disclosure,0))
 
 with col3:
     pe = st.number_input('Insert P/E Ratio')
     st.write('P/E Ratio is ', round(pe,0))
 
+if sector == "Energy":
+    st.write("(For energy companies only) Revenue % for:")
+    col1,col2,col3,col4,col5,col6,col7 = st.columns(7)
+    with col1:
+        arc_rev = st.number_input("Arctic Drilling %:")
+    with col2:
+        coal_rev = st.number_input("Coal %:")
+    with col3:
+        nuc_rev = st.number_input("Nuclear %:")
+    with col4:
+        oil_rev = st.number_input("Oil & Sands %:")
+    with col5:
+        shale_rev = st.number_input("Shale Oil & Gas %:")
+    with col6:
+        uds_rev = st.number_input("Ultra Deep Sea Drilling %:")
+    with col7:
+        thr_rev = st.number_input("Thermal Coal %:")
 
-option = st.selectbox(
+
+col1,col2 = st.columns([3,1])
+with col1:
+    secrev1 = st.selectbox(
     'Sector Revenue #1',
     ( '', 'Abrasive product manufacturing',
  'Accounting, tax preparation, bookkeeping, and payroll services',
@@ -498,9 +532,16 @@ option = st.selectbox(
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork'))
-st.write('You selected:', option)
 
-option = st.selectbox(
+with col2:
+    secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
+
+# if secrev1 !='':
+#     st.write('You selected:', secrev1, 'at', secrev_pc1, '%')
+col1,col2 = st.columns([3,1])
+
+with col1:
+    secrev2 = st.selectbox(
     'Sector Revenue #2',
     ( '', 'Abrasive product manufacturing',
  'Accounting, tax preparation, bookkeeping, and payroll services',
@@ -946,9 +987,14 @@ option = st.selectbox(
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork'))
-st.write('You selected:', option)
+with col2:
+    secrev_pc2 = st.slider("Percentage:", 0, 100, 33, key="secrev2")
+# if secrev2 !='':
+#     st.write('You selected:', secrev2, 'at', secrev_pc2, '%')
+col1,col2 = st.columns([3,1])
 
-option = st.selectbox(
+with col1:
+    secrev3 = st.selectbox(
     'Sector Revenue #3',
     ( '', 'Abrasive product manufacturing',
  'Accounting, tax preparation, bookkeeping, and payroll services',
@@ -1394,13 +1440,481 @@ option = st.selectbox(
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork'))
-st.write('You selected:', option)
+with col2:
+    secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
+# if secrev3 !='':
+#     st.write('You selected:', secrev3, 'at', secrev_pc3, '%')
 
-st.write("Here is the prediction for our random row:")
-# result = model.predict(X_tx)
-## print output
-# st.write(result[0])
-st.write("... and this is the predicted Carbon Intensity for your company (Scope 1\
+X = pd.DataFrame({"Sector":[sector],
+                'Employees / Revenue':employees/revenue if revenue!=0 else 0,
+                'EV / Revenue':ev/revenue if revenue!=0 else 0,
+                'climate_strategy_score':c_score,
+                'disclosure':disclosure,
+ 'pe_rat':pe,
+ 'revenue':revenue,
+ 'nuclear_percentage_revenue':nuc_rev if sector == "Energy" else 0.,
+ 'thermal_coal_percentage_revenue':thr_rev if sector == "Energy" else 0.,
+ 'ultra_deep_sea_drilling_percentage_revenue':uds_rev if sector == "Energy" else 0.,
+ 'shale_oil_gas_percentage_revenue':shale_rev if sector == "Energy" else 0.,
+ 'coal_percentage_revenue':coal_rev if sector == "Energy" else 0.,
+ 'arctic_drilling_percentage_revenue':arc_rev if sector == "Energy" else 0.,
+ 'oil_sands_percentage_revenue':oil_rev if sector == "Energy" else 0.,
+ 'Abrasive product manufacturing':0.,
+ 'Accounting, tax preparation, bookkeeping, and payroll services':0.,
+ 'Adhesive manufacturing':0.,
+ 'Advertising and related services':0.,
+ 'Air and gas compressor manufacturing':0.,
+ 'Air conditioning, refrigeration, and warm air heating equipment manufacturing':0.,
+ 'Air purification and ventilation equipment manufacturing':0.,
+ 'Air transportation':0.,
+ 'Aircraft engine and engine parts manufacturing':0.,
+ 'Aircraft manufacturing':0.,
+ 'Alkalies and chlorine manufacturing':0.,
+ 'All other basic inorganic chemical manufacturing':0.,
+ 'All other chemical product and preparation manufacturing':0.,
+ 'All other converted paper product manufacturing':0.,
+ 'All other crop farming':0.,
+ 'All other food manufacturing':0.,
+ 'All other forging, stamping, and sintering':0.,
+ 'All other miscellaneous electrical equipment and component manufacturing':0.,
+ 'All other miscellaneous manufacturing':0.,
+ 'All other miscellaneous professional, scientific, and technical services':0.,
+ 'All other miscellaneous wood product manufacturing':0.,
+ 'All other paper bag and coated and treated paper manufacturing':0.,
+ 'All other petroleum and coal products manufacturing':0.,
+ 'All other textile product mills':0.,
+ 'All other transportation equipment manufacturing':0.,
+ 'Alumina refining and primary aluminum production':0.,
+ 'Aluminum product manufacturing from purchased aluminum':0.,
+ 'Ammunition manufacturing':0.,
+ 'Amusement parks, arcades, and gambling industries':0.,
+ 'Analytical laboratory instrument manufacturing':0.,
+ 'Animal (except poultry) slaughtering, rendering, and processing':0.,
+ 'Animal production, except cattle and poultry and eggs':0.,
+ 'Apparel accessories and other apparel manufacturing':0.,
+ 'Apparel knitting mills':0.,
+ 'Apparel, Piece Goods, and Notions Wholesalers':0.,
+ 'Architectural, engineering, and related services':0.,
+ 'Arms, ordnance, and accessories manufacturing':0.,
+ 'Artificial and synthetic fibers and filaments manufacturing':0.,
+ 'Asphalt paving mixture and block manufacturing':0.,
+ 'Asphalt shingle and coating materials manufacturing':0.,
+ 'Audio and video equipment manufacturing':0.,
+ 'Automatic environmental control manufacturing':0.,
+ 'Automobile manufacturing':0.,
+ 'Automotive equipment rental and leasing':0.,
+ 'Automotive repair and maintenance, except car washes':0.,
+ 'Ball and roller bearing manufacturing':0.,
+ 'Bare printed circuit board manufacturing':0.,
+ 'Bauxite Mining':0.,
+ 'Beet sugar manufacturing':0.,
+ 'Biological product (except diagnostic) manufacturing':0.,
+ 'Biomass Power Generation':0.,
+ 'Bituminous Coal Underground Mining':0.,
+ 'Bituminous Coal and Lignite Surface Mining':0.,
+ 'Blind and shade manufacturing':0.,
+ 'Boat building':0.,
+ 'Book publishers':0.,
+ 'Bowling centers':0.,
+ 'Bread and bakery product manufacturing':0.,
+ 'Breakfast cereal manufacturing':0.,
+ 'Breweries':0.,
+ 'Brick, tile, and other structural clay product manufacturing':0.,
+ 'Broadcast and wireless communications equipment':0.,
+ 'Broadwoven fabric mills':0.,
+ 'Broom, brush, and mop manufacturing':0.,
+ 'Building Material and Garden Equipment and Supplies Dealers':0.,
+ 'Business support services':0.,
+ 'Cable and other subscription programming':0.,
+ 'Car washes':0.,
+ 'Carbon and graphite product manufacturing':0.,
+ 'Carbon black manufacturing':0.,
+ 'Carpet and rug mills':0.,
+ 'Cattle ranching and farming':0.,
+ 'Cement manufacturing':0.,
+ 'Cheese manufacturing':0.,
+ 'Child day care services':0.,
+ 'Chocolate and confectionery manufacturing from cacao beans':0.,
+ 'Clay and nonclay refractory manufacturing':0.,
+ 'Clothing and Clothing Accessories Stores':0.,
+ 'Coal Power Generation':0.,
+ 'Coated and laminated paper, packaging paper and plastics film manufacturing':0.,
+ 'Coating, engraving, heat treating and allied activities':0.,
+ 'Coffee and tea manufacturing':0.,
+ 'Commercial and industrial machinery and equipment rental and leasing':0.,
+ 'Commercial and industrial machinery and equipment repair and maintenance':0.,
+ 'Communication and energy wire and cable manufacturing':0.,
+ 'Community food, housing, and other relief services, including rehabilitation services':0.,
+ 'Computer storage device manufacturing':0.,
+ 'Computer systems design services':0.,
+ 'Computer terminals and other computer peripheral equipment manufacturing':0.,
+ 'Concrete pipe, brick, and block manufacturing':0.,
+ 'Confectionery manufacturing from purchased chocolate':0.,
+ 'Construction machinery manufacturing':0.,
+ 'Cookie, cracker, and pasta manufacturing':0.,
+ 'Copper Mining':0.,
+ 'Copper rolling, drawing, extruding and alloying':0.,
+ 'Cotton farming':0.,
+ 'Couriers and messengers':0.,
+ 'Crown and closure manufacturing and metal stamping':0.,
+ 'Crude Petroleum and Natural Gas Extraction':0.,
+ 'Curtain and linen mills':0.,
+ 'Custom architectural woodwork and millwork manufacturing':0.,
+ 'Custom computer programming services':0.,
+ 'Cut and sew apparel contractors':0.,
+ 'Cut stone and stone product manufacturing':0.,
+ 'Cutlery, utensil, pot, and pan manufacturing':0.,
+ 'Cutting tool and machine tool accessory manufacturing':0.,
+ 'Dairy cattle and milk production':0.,
+ 'Data processing, hosting, and related services':0.,
+ 'Death care services':0.,
+ 'Dental equipment and supplies manufacturing':0.,
+ 'Directory, mailing list, and other publishers':0.,
+ 'Distilleries':0.,
+ 'Dog and cat food manufacturing':0.,
+ 'Doll, toy, and game manufacturing':0.,
+ 'Drilling oil and gas wells':0.,
+ 'Dry, condensed, and evaporated dairy product manufacturing':0.,
+ 'Dry-cleaning and laundry services':0.,
+ 'Electric Bulk Power Transmission and Control':0.,
+ 'Electric Power Distribution':0.,
+ 'Electric lamp bulb and part manufacturing':0.,
+ 'Electrical and Electronic Goods Wholesalers':0.,
+ 'Electricity and signal testing instruments manufacturing':0.,
+ 'Electromedical and electrotherapeutic apparatus manufacturing':0.,
+ 'Electron tube manufacturing':0.,
+ 'Electronic and precision equipment repair and maintenance':0.,
+ 'Electronic capacitor, resistor, coil, transformer, and other inductor manufacturing':0.,
+ 'Electronic computer manufacturing':0.,
+ 'Electronic connector manufacturing':0.,
+ 'Electronics and Appliance Stores':0.,
+ 'Elementary and secondary schools':0.,
+ 'Employment services':0.,
+ 'Engineered wood member and truss manufacturing':0.,
+ 'Environmental and other technical consulting services':0.,
+ 'Fabric coating mills':0.,
+ 'Fabricated pipe and pipe fitting manufacturing':0.,
+ 'Facilities support services':0.,
+ 'Farm machinery and equipment manufacturing':0.,
+ 'Fats and oils refining and blending':0.,
+ 'Ferrous metal foundries':0.,
+ 'Fertilizer manufacturing':0.,
+ 'Fiber, yarn, and thread mills':0.,
+ 'Fishing':0.,
+ 'Fitness and recreational sports centers':0.,
+ 'Flat glass manufacturing':0.,
+ 'Flavoring syrup and concentrate manufacturing':0.,
+ 'Flour milling and malt manufacturing':0.,
+ 'Fluid milk and butter manufacturing':0.,
+ 'Fluid power process machinery':0.,
+ 'Food services and drinking places':0.,
+ 'Food, Beverage, Health, and Personal Care Stores':0.,
+ 'Footwear manufacturing':0.,
+ 'Forest nurseries, forest products, and timber tracts':0.,
+ 'Frozen food manufacturing':0.,
+ 'Fruit and vegetable canning, pickling, and drying':0.,
+ 'Fruit farming':0.,
+ 'Funds, trusts, and other financial vehicles':0.,
+ 'Furniture and Home Furnishings Stores':0.,
+ 'Gasket, packing, and sealing device manufacturing':0.,
+ 'Gasoline Stations':0.,
+ 'General Merchandise Stores':0.,
+ 'General and consumer goods rental except video tapes and discs':0.,
+ 'Geothermal Power Generation':0.,
+ 'Glass container manufacturing':0.,
+ 'Glass product manufacturing made of purchased glass':0.,
+ 'Gold Ore Mining':0.,
+ 'Grain farming':0.,
+ 'Grantmaking, giving, and social advocacy organizations':0.,
+ 'Greenhouse, nursery, and floriculture production':0.,
+ 'Grocery and Related Product Wholesalers':0.,
+ 'Ground or treated mineral and earth manufacturing':0.,
+ 'Guided missile and space vehicle manufacturing':0.,
+ 'Handtool manufacturing':0.,
+ 'Hardware manufacturing':0.,
+ 'Heating equipment (except warm air furnaces) manufacturing':0.,
+ 'Heavy duty truck manufacturing':0.,
+ 'Home health care services':0.,
+ 'Hospitals':0.,
+ 'Hotels and motels, including casino hotels':0.,
+ 'Household cooking appliance manufacturing':0.,
+ 'Household laundry equipment manufacturing':0.,
+ 'Household refrigerator and home freezer manufacturing':0.,
+ 'Hydroelectric Power Generation':0.,
+ 'Ice cream and frozen dessert manufacturing':0.,
+ 'In-vitro diagnostic substance manufacturing':0.,
+ 'Independent artists, writers, and performers':0.,
+ 'Individual and family services':0.,
+ 'Industrial gas manufacturing':0.,
+ 'Industrial mold manufacturing':0.,
+ 'Industrial process furnace and oven manufacturing':0.,
+ 'Industrial process variable instruments manufacturing':0.,
+ 'Institutional furniture manufacturing':0.,
+ 'Insurance agencies, brokerages, and related activities':0.,
+ 'Insurance carriers':0.,
+ 'Internet publishing and broadcasting':0.,
+ 'Internet service providers and web search portals':0.,
+ 'Investigation and security services':0.,
+ 'Iron and steel mills and ferroalloy manufacturing':0.,
+ 'Iron ore mining':0.,
+ 'Irradiation apparatus manufacturing':0.,
+ 'Jewelry and silverware manufacturing':0.,
+ 'Junior colleges, colleges, universities, and professional schools':0.,
+ 'Knit fabric mills':0.,
+ 'Laminated plastics plate, sheet (except packaging), and shape manufacturing':0.,
+ 'Landfill Gas Power Generation':0.,
+ 'Lawn and garden equipment manufacturing':0.,
+ 'Lead Ore and Zinc Ore Mining':0.,
+ 'Leather and hide tanning and finishing':0.,
+ 'Legal services':0.,
+ 'Lessors of nonfinancial intangible assets':0.,
+ 'Light truck and utility vehicle manufacturing':0.,
+ 'Lighting fixture manufacturing':0.,
+ 'Lime and gypsum product manufacturing':0.,
+ 'Logging':0.,
+ 'Lumber and Other Construction Materials Wholesalers':0.,
+ 'Magnetic and optical recording media manufacturing':0.,
+ 'Management of companies and enterprises':0.,
+ 'Management, scientific, and technical consulting services':0.,
+ 'Manufactured home (mobile home) manufacturing':0.,
+ 'Material handling equipment manufacturing':0.,
+ 'Mattress manufacturing':0.,
+ 'Mechanical power transmission equipment manufacturing':0.,
+ 'Medical and diagnostic labs and outpatient and other ambulatory care services':0.,
+ 'Medicinal and botanical manufacturing':0.,
+ "Men's and boys' cut and sew apparel manufacturing":0.,
+ 'Metal and other household furniture manufacturing':0.,
+ 'Metal can, box, and other metal container (light gauge) manufacturing':0.,
+ 'Metal cutting and forming machine tool manufacturing':0.,
+ 'Metal tank (heavy gauge) manufacturing':0.,
+ 'Military armored vehicle, tank, and tank component manufacturing':0.,
+ 'Mineral wool manufacturing':0.,
+ 'Mining and oil and gas field machinery manufacturing':0.,
+ 'Miscellaneous Durable Goods Wholesalers':0.,
+ 'Miscellaneous Nondurable Goods Wholesalers':0.,
+ 'Miscellaneous Store Retailers':0.,
+ 'Miscellaneous nonmetallic mineral products':0.,
+ 'Monetary authorities and depository credit intermediation':0.,
+ 'Motion picture and video industries':0.,
+ 'Motor Vehicle and Machinery, Equipment, and Supplies Wholesalers':0.,
+ 'Motor Vehicle and Parts Dealers':0.,
+ 'Motor and generator manufacturing':0.,
+ 'Motor home manufacturing':0.,
+ 'Motor vehicle body manufacturing':0.,
+ 'Motor vehicle parts manufacturing':0.,
+ 'Motorcycle, bicycle, and parts manufacturing':0.,
+ 'Museums, historical sites, zoos, and parks':0.,
+ 'Musical instrument manufacturing':0.,
+ 'Narrow fabric mills and schiffli machine embroidery':0.,
+ 'Natural Gas Liquid Extraction':0.,
+ 'Natural Gas Power Generation':0.,
+ 'Natural gas distribution':0.,
+ 'Newspaper publishers':0.,
+ 'Nickel Mining':0.,
+ 'Nonchocolate confectionery manufacturing':0.,
+ 'Nondepository credit intermediation and related activities':0.,
+ 'Nonferrous metal (except copper and aluminum) rolling, drawing, extruding and alloying':0.,
+ 'Nonferrous metal foundries':0.,
+ 'Nonresidential commercial and health care structures':0.,
+ 'Nonresidential maintenance and repair':0.,
+ 'Nonresidential manufacturing structures':0.,
+ 'Nonstore Retailers':0.,
+ 'Nonupholstered wood household furniture manufacturing':0.,
+ 'Nonwoven fabric mills':0.,
+ 'Nuclear Electric Power Generation':0.,
+ 'Nursing and residential care facilities':0.,
+ 'Office administrative services':0.,
+ 'Office furniture manufacturing':0.,
+ 'Office supplies (except paper) manufacturing':0.,
+ 'Offices of physicians, dentists, and other health practitioners':0.,
+ 'Oilseed farming':0.,
+ 'Ophthalmic goods manufacturing':0.,
+ 'Optical instrument and lens manufacturing':0.,
+ 'Ornamental and architectural metal products manufacturing':0.,
+ 'Other Electric Power Generation':0.,
+ 'Other Metal Ore Mining':0.,
+ 'Other accommodations':0.,
+ 'Other aircraft parts and auxiliary equipment manufacturing':0.,
+ 'Other amusement and recreation industries':0.,
+ 'Other animal food manufacturing':0.,
+ 'Other basic organic chemical manufacturing':0.,
+ 'Other commercial and service industry machinery manufacturing':0.,
+ 'Other communications equipment manufacturing':0.,
+ 'Other computer related services, including facilities management':0.,
+ 'Other concrete product manufacturing':0.,
+ 'Other cut and sew apparel manufacturing':0.,
+ 'Other educational services':0.,
+ 'Other electronic component manufacturing':0.,
+ 'Other engine equipment manufacturing':0.,
+ 'Other fabricated metal manufacturing':0.,
+ 'Other general purpose machinery manufacturing':0.,
+ 'Other industrial machinery manufacturing':0.,
+ 'Other information services':0.,
+ 'Other leather and allied product manufacturing':0.,
+ 'Other major household appliance manufacturing':0.,
+ 'Other nonmetallic mineral mining and quarrying':0.,
+ 'Other nonresidential structures':0.,
+ 'Other personal services':0.,
+ 'Other plastics product manufacturing':0.,
+ 'Other pressed and blown glass and glassware manufacturing':0.,
+ 'Other residential structures':0.,
+ 'Other rubber product manufacturing':0.,
+ 'Other support services':0.,
+ 'Packaging machinery manufacturing':0.,
+ 'Paint and coating manufacturing':0.,
+ 'Paper mills':0.,
+ 'Paperboard Mills':0.,
+ 'Paperboard container manufacturing':0.,
+ 'Performing arts companies':0.,
+ 'Periodical publishers':0.,
+ 'Personal and household goods repair and maintenance':0.,
+ 'Personal care services':0.,
+ 'Pesticide and other agricultural chemical manufacturing':0.,
+ 'Petrochemical manufacturing':0.,
+ 'Petroleum Power Generation':0.,
+ 'Petroleum lubricating oil and grease manufacturing':0.,
+ 'Petroleum refineries':0.,
+ 'Petroleum, Chemical, and Allied Products Wholesalers':0.,
+ 'Pharmaceutical preparation manufacturing':0.,
+ 'Photographic and photocopying equipment manufacturing':0.,
+ 'Photographic services':0.,
+ 'Pipeline transportation':0.,
+ 'Plastics and rubber industry machinery manufacturing':0.,
+ 'Plastics bottle manufacturing':0.,
+ 'Plastics material and resin manufacturing':0.,
+ 'Plastics packaging materials and unlaminated film and sheet manufacturing':0.,
+ 'Plastics pipe and pipe fitting manufacturing':0.,
+ 'Plate work and fabricated structural product manufacturing':0.,
+ 'Plumbing fixture fitting and trim manufacturing':0.,
+ 'Polystyrene foam product manufacturing':0.,
+ 'Postal service':0.,
+ 'Pottery, ceramics, and plumbing fixture manufacturing':0.,
+ 'Poultry and egg production':0.,
+ 'Poultry processing':0.,
+ 'Power boiler and heat exchanger manufacturing':0.,
+ 'Power, distribution, and specialty transformer manufacturing':0.,
+ 'Power-driven handtool manufacturing':0.,
+ 'Prefabricated wood building manufacturing':0.,
+ 'Primary battery manufacturing':0.,
+ 'Primary smelting and refining of copper':0.,
+ 'Primary smelting and refining of nonferrous metal (except copper and aluminum)':0.,
+ 'Printed circuit assembly (electronic assembly) manufacturing':0.,
+ 'Printing':0.,
+ 'Printing ink manufacturing':0.,
+ 'Promoters of performing arts and sports and agents for public figures':0.,
+ 'Propulsion units and parts for space vehicles and guided missiles':0.,
+ 'Pulp mills':0.,
+ 'Pump and pumping equipment manufacturing':0.,
+ 'Radio and television broadcasting':0.,
+ 'Rail transportation (Diesel)':0.,
+ 'Rail transportation (Electric)':0.,
+ 'Railroad rolling stock manufacturing':0.,
+ 'Ready-mix concrete manufacturing':0.,
+ 'Real estate':0.,
+ 'Reconstituted wood product manufacturing':0.,
+ 'Relay and industrial control manufacturing':0.,
+ 'Residential maintenance and repair':0.,
+ 'Residential permanent site single- and multi-family structures':0.,
+ 'Rolling mill and other metalworking machinery manufacturing':0.,
+ 'Rubber and plastics hoses and belting manufacturing':0.,
+ 'Sand, gravel, clay, and ceramic and refractory minerals mining and quarrying':0.,
+ 'Sanitary paper product manufacturing':0.,
+ 'Sawmills and wood preservation':0.,
+ 'Scientific research and development services':0.,
+ 'Seafood product preparation and packaging':0.,
+ 'Search, detection, and navigation instruments manufacturing':0.,
+ 'Seasoning and dressing manufacturing':0.,
+ 'Secondary smelting and alloying of aluminum':0.,
+ 'Securities, commodity contracts, investments, and related activities':0.,
+ 'Semiconductor and related device manufacturing':0.,
+ 'Semiconductor machinery manufacturing':0.,
+ 'Services to buildings and dwellings':0.,
+ 'Ship building and repairing':0.,
+ 'Showcase, partition, shelving, and locker manufacturing':0.,
+ 'Sign manufacturing':0.,
+ 'Small electrical appliance manufacturing':0.,
+ 'Snack food manufacturing':0.,
+ 'Soap and cleaning compound manufacturing':0.,
+ 'Soft drink and ice manufacturing':0.,
+ 'Software publishers':0.,
+ 'Software, audio, and video media reproducing':0.,
+ 'Solar Power Generation':0.,
+ 'Sound recording industries':0.,
+ 'Soybean and other oilseed processing':0.,
+ 'Special tool, die, jig, and fixture manufacturing':0.,
+ 'Specialized design services':0.,
+ 'Spectator sports':0.,
+ 'Speed changer, industrial high-speed drive, and gear manufacturing':0.,
+ 'Sporting and athletic goods manufacturing':0.,
+ 'Spring and wire product manufacturing':0.,
+ 'Stationery product manufacturing':0.,
+ 'Steel product manufacturing from purchased steel':0.,
+ 'Stone mining and quarrying':0.,
+ 'Storage battery manufacturing':0.,
+ 'Sugar cane mills and refining':0.,
+ 'Sugarcane and sugar beet farming':0.,
+ 'Support activities for agriculture and forestry':0.,
+ 'Support activities for oil and gas operations':0.,
+ 'Support activities for other mining':0.,
+ 'Support activities for printing':0.,
+ 'Support activities for transportation':0.,
+ 'Surgical and medical instrument manufacturing':0.,
+ 'Surgical appliance and supplies manufacturing':0.,
+ 'Switchgear and switchboard apparatus manufacturing':0.,
+ 'Synthetic dye and pigment manufacturing':0.,
+ 'Synthetic rubber manufacturing':0.,
+ 'Tar Sands Extraction':0.,
+ 'Telecommunications':0.,
+ 'Telephone apparatus manufacturing':0.,
+ 'Textile and fabric finishing mills':0.,
+ 'Textile bag and canvas mills':0.,
+ 'Tire manufacturing':0.,
+ 'Tobacco product manufacturing':0.,
+ 'Toilet preparation manufacturing':0.,
+ 'Totalizing fluid meters and counting devices manufacturing':0.,
+ 'Transit and ground passenger transportation':0.,
+ 'Travel arrangement and reservation services':0.,
+ 'Travel trailer and camper manufacturing':0.,
+ 'Tree nut farming':0.,
+ 'Truck trailer manufacturing':0.,
+ 'Truck transportation':0.,
+ 'Turbine and turbine generator set units manufacturing':0.,
+ 'Turned product and screw, nut, and bolt manufacturing':0.,
+ 'Unlaminated plastics profile shape manufacturing':0.,
+ 'Upholstered household furniture manufacturing':0.,
+ 'Uranium-Radium-Vanadium Ore Mining':0.,
+ 'Urethane and other foam product (except polystyrene) manufacturing':0.,
+ 'Valve and fittings other than plumbing':0.,
+ 'Vegetable and melon farming':0.,
+ 'Vending, commercial, industrial, and office machinery manufacturing':0.,
+ 'Veneer and plywood manufacturing':0.,
+ 'Veterinary services':0.,
+ 'Warehousing and storage':0.,
+ 'Waste management and remediation services':0.,
+ 'Watch, clock, and other measuring and controlling device manufacturing':0.,
+ 'Water transportation':0.,
+ 'Water, sewage and other systems':0.,
+ 'Wave & Tidal Power Generation':0.,
+ 'Wet corn milling':0.,
+ 'Wind Power Generation':0.,
+ 'Wineries':0.,
+ 'Wiring device manufacturing':0.,
+ "Women's and girls' cut and sew apparel manufacturing":0.,
+ 'Wood container and pallet manufacturing':0.,
+ 'Wood kitchen cabinet and countertop manufacturing':0.,
+ 'Wood windows and doors and millwork':0.})
+
+X[secrev1] = secrev_pc1/100
+X[secrev2] = secrev_pc2/100
+X[secrev3] = secrev_pc3/100
+if st.button('Calculate!'):
+    tx = joblib.load(txpath)
+    X_tx = tx.transform(X)
+    st.write("Here is the prediction for the company:")
+    result = model.predict(X_tx)
+    ## print output
+    st.write(result[0])
+    st.write("... and this is the predicted Carbon Intensity for your company (Scope 1\
     and Scope 2 included)")
 # y_test = pd.read_csv(ypath)
 # st.write("And the true value of C-emission is:")
