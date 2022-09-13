@@ -24,10 +24,8 @@ st.title("Predict how much annual carbon emission your company has")
 model = XGBRegressor()
 model.load_model(modelpath)
 # loaded = joblib.load(modelpath)
-# st.write("This is our model:")
-# st.write(type(model))
-## enter input as boxes ideally but can just use one line of our data first
-# X_test = pd.read_csv(filepath)
+
+
 col1,col2 = st.columns([4,1])
 with col2:
     preset = st.selectbox("Presets", ("","Company 1","Company 2", "Company 3"))
@@ -65,57 +63,41 @@ col1, col2, col3 = st.columns(3)
 with col1:
     if preset == "Company 1":
         revenue = st.number_input('Insert company revenue ($mn)', value=10000)
-        st.write('The revenue is ', round(revenue,0))
     elif preset == "Company 2":
         revenue = st.number_input('Insert company revenue ($mn)', value=3000)
-        st.write('The revenue is ', round(revenue,0))
     elif preset == "Company 3":
         revenue = st.number_input('Insert company revenue ($mn)', value=1000)
-        st.write('The revenue is ', round(revenue,0))
     else:
         revenue = st.number_input('Insert company revenue ($mn)', value=100)
-        st.write('The revenue is ', round(revenue,0))
 with col2:
     if preset == "Company 1":
         employees = st.number_input('Insert number of employees', value=200000)
-        st.write('Employee number is ', round(employees,0))
     elif preset == "Company 2":
         employees = st.number_input('Insert number of employees', value=40000)
-        st.write('Employee number is ', round(employees,0))
     elif preset == "Company 2":
         employees = st.number_input('Insert number of employees', value=24000)
-        st.write('Employee number is ', round(employees,0))
     else:
         employees = st.number_input('Insert number of employees', value=2000)
-        st.write('Employee number is ', round(employees,0))
 
 with col3:
     if preset == "Company 1":
         ev = st.number_input('Insert Enterprise Value', value=15000)
-        st.write('Enterprise Value is ', round(ev,0))
     elif preset == "Company 2":
         ev = st.number_input('Insert Enterprise Value', value=18000)
-        st.write('Enterprise Value is ', round(ev,0))
     elif preset == "Company 3":
         ev = st.number_input('Insert Enterprise Value', value=20000)
-        st.write('Enterprise Value is ', round(ev,0))
     else:
         ev = st.number_input('Insert Enterprise Value', value=5000)
-        st.write('Enterprise Value is ', round(ev,0))
 
 with col1:
     if preset == "Company 1":
         c_score = st.slider('Select Climate Strategy Score', 0, 100, 20)
-        st.write('CS Score is ', round(c_score,0))
     elif preset == "Company 2":
         c_score = st.slider('Select Climate Strategy Score', 0, 100, 87)
-        st.write('CS Score is ', round(c_score,0))
     elif preset == "Company 3":
         c_score = st.slider('Select Climate Strategy Score', 0, 100, 74)
-        st.write('CS Score is ', round(c_score,0))
     else:
         c_score = st.slider('Select Climate Strategy Score', 0, 100, 50)
-        st.write('CS Score is ', round(c_score,0))
 # with col2:
 #     disclosure = st.slider('Insert % of Emission Disclosures', 0,100,50)
 #     st.write('% Disclosures is ', round(disclosure,0))
@@ -123,60 +105,58 @@ with col1:
 with col2:
     if preset == "Company 1":
         pe = st.number_input('Insert P/E Ratio', value=11.2)
-        st.write('P/E Ratio is ', round(pe,0))
     elif preset == "Company 2":
         pe = st.number_input('Insert P/E Ratio', value=12.6)
-        st.write('P/E Ratio is ', round(pe,0))
     elif preset == "Company 3":
         pe = st.number_input('Insert P/E Ratio', value=19.8)
-        st.write('P/E Ratio is ', round(pe,0))
     else:
         pe = st.number_input('Insert P/E Ratio', value=10.0)
-        st.write('P/E Ratio is ', round(pe,0))
-
+ene_err = False
 if sector == "Energy":
     st.write("(For energy companies only) Revenue % for:")
     col1,col2,col3,col4,col5,col6,col7 = st.columns(7)
     if preset == "Company 1":
         with col1:
-            arc_rev = st.number_input("Arctic Drilling %:",value=5.)
+            arc_rev = st.number_input("Arctic Drilling %:",step=1.,value=5.)
         with col2:
-            coal_rev = st.number_input("Coal %:", value=26.)
+            coal_rev = st.number_input("Coal %:",step=1., value=26.)
         with col3:
-            nuc_rev = st.number_input("Nuclear %:", value=8.)
+            nuc_rev = st.number_input("Nuclear %:",step=1., value=8.)
         with col4:
-            oil_rev = st.number_input("Oil & Sands %:", value=4.)
+            oil_rev = st.number_input("Oil & Sands %:",step=1., value=4.)
         with col5:
-            shale_rev = st.number_input("Shale Oil & Gas %:", value=30.)
+            shale_rev = st.number_input("Shale Oil & Gas %:",step=1., value=30.)
         with col6:
-            uds_rev = st.number_input("Ultra Deep Sea Drilling %:", value=15.)
+            uds_rev = st.number_input("Ultra Deep Sea Drilling %:",step=1., value=15.)
         with col7:
-            thr_rev = st.number_input("Thermal Coal %:",value=12.)
-        with col1:
-            if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
-                st.write("Total Revenue % should not be over 100% :)")
-        with col7:
-            st.write("Total input % =", arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev)
+            thr_rev = st.number_input("Thermal Coal %:",step=1.,value=12.)
+
+        st.write("Total input =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2), "%")
+        if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
+            pow_rev_warn = '<p style="color:Red; font-size: 16px;">Total Revenue % should not be over 100% :)</p>'
+            st.markdown(pow_rev_warn, unsafe_allow_html=True)
+            ene_err = True
+
     else:
         with col1:
-            arc_rev = st.number_input("Arctic Drilling %:")
+            arc_rev = st.number_input("Arctic Drilling %:",step=1.)
         with col2:
-            coal_rev = st.number_input("Coal %:")
+            coal_rev = st.number_input("Coal %:",step=1.)
         with col3:
-            nuc_rev = st.number_input("Nuclear %:")
+            nuc_rev = st.number_input("Nuclear %:",step=1.)
         with col4:
-            oil_rev = st.number_input("Oil & Sands %:")
+            oil_rev = st.number_input("Oil & Sands %:",step=1.)
         with col5:
-            shale_rev = st.number_input("Shale Oil & Gas %:")
+            shale_rev = st.number_input("Shale Oil & Gas %:",step=1.)
         with col6:
-            uds_rev = st.number_input("Ultra Deep Sea Drilling %:")
+            uds_rev = st.number_input("Ultra Deep Sea Drilling %:",step=1.)
         with col7:
             thr_rev = st.number_input("Thermal Coal %:")
-        with col1:
-            if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
-                st.write("Total Revenue % should not be over 100% :)")
-        with col7:
-            st.write("Total input % =", arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev)
+        st.write("Total input % =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2))
+        if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
+            pow_rev_warn = '<p style="color:Red; font-size: 14px;">Total Revenue % should not be over 100% :)</p>'
+            st.markdown(pow_rev_warn, unsafe_allow_html=True)
+            ene_err = True
 
 secrev_list = ( '', 'Abrasive product manufacturing',
  'Accounting, tax preparation, bookkeeping, and payroll services',
@@ -626,103 +606,78 @@ secrev_list = ( '', 'Abrasive product manufacturing',
 col1,col2 = st.columns([3,1])
 if preset == "Company 1":
     with col1:
-        secrev1 = st.selectbox(
-        'Sector Revenue #1', secrev_list, index=231
-        )
-
+        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=231)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 45, key="secrev1")
+
 elif preset == "Company 2":
     with col1:
-        secrev1 = st.selectbox(
-        'Sector Revenue #1', secrev_list, index=149
-        )
-
+        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=149)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 60, key="secrev1")
+
 elif preset == "Company 3":
     with col1:
-        secrev1 = st.selectbox(
-        'Sector Revenue #1', secrev_list, index=194
-        )
-
+        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=194)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 58, key="secrev1")
+
 else:
     with col1:
-        secrev1 = st.selectbox(
-    'Sector Revenue #1', secrev_list
-    )
-
+        secrev1 = st.selectbox('Sector Revenue #1', secrev_list)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
-# if secrev1 !='':
-#     st.write('You selected:', secrev1, 'at', secrev_pc1, '%')
+
 col1,col2 = st.columns([3,1])
 if preset == "Company 1":
     with col1:
-        secrev2 = st.selectbox(
-        'Sector Revenue #2',
-        secrev_list, index=396)
+        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=396)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, 36, key="secrev2")
 elif preset == "Company 2":
     with col1:
-        secrev2 = st.selectbox(
-        'Sector Revenue #2',
-        secrev_list, index=194)
+        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=194)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, 27, key="secrev2")
 elif preset == "Company 3":
     with col1:
-        secrev2 = st.selectbox(
-        'Sector Revenue #2',
-        secrev_list, index=29)
+        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=29)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, 34, key="secrev2")
 else:
     with col1:
-        secrev2 = st.selectbox(
-        'Sector Revenue #2',
-        secrev_list)
+        secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
 
-# if secrev2 !='':
-#     st.write('You selected:', secrev2, 'at', secrev_pc2, '%')
+
 col1,col2 = st.columns([3,1])
 if preset == "Company 1":
     with col1:
-        secrev3 = st.selectbox(
-        'Sector Revenue #3',
-        secrev_list, index=248)
+        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=248)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 elif preset == "Company 2":
     with col1:
-        secrev3 = st.selectbox(
-        'Sector Revenue #3',
-        secrev_list, index=234)
+        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=234)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 elif preset == "Company 3":
     with col1:
-        secrev3 = st.selectbox(
-        'Sector Revenue #3',
-        secrev_list, index=319)
+        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=319)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 else:
     with col1:
-        secrev3 = st.selectbox(
-        'Sector Revenue #3',
-        secrev_list)
+        secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-# if secrev3 !='':
-#     st.write('You selected:', secrev3, 'at', secrev_pc3, '%')
+
+secrev_err = False
 if secrev_pc1+secrev_pc2+secrev_pc3 > 100.0:
-    st.write("The sector revenue % should not be over 100% :)")
+    secrev_warn = '<p style="color:Red; font-size: 16px;">The sector revenue % should not be over 100% :)</p>'
+    st.markdown(secrev_warn, unsafe_allow_html=True)
+    secrev_err = True
 X = pd.DataFrame({"Sector":[sector],
                 'Employees / Revenue':employees/revenue if revenue!=0 else 0,
                 'EV / Revenue':ev/revenue if revenue!=0 else 0,
@@ -1185,16 +1140,21 @@ X = pd.DataFrame({"Sector":[sector],
 X[secrev1] = secrev_pc1/100
 X[secrev2] = secrev_pc2/100
 X[secrev3] = secrev_pc3/100
-if st.button('Calculate!'):
 
-    tx = joblib.load(txpath)
-    X_tx = tx.transform(X)
-    st.write("Here is the prediction for the company:")
-    result = model.predict(X_tx)
-    ## print output
-    st.write(result[0])
-    st.write("... and this is the predicted Carbon Intensity for your company (Scope 1\
-    and Scope 2 included)")
-# y_test = pd.read_csv(ypath)
-# st.write("And the true value of C-emission is:")
-# st.write(y_test.loc[rdn])
+if secrev_err == True or ene_err == True:
+    st.button('Calculate!', disabled=True)
+else:
+    if st.button('Calculate!'):
+
+        tx = joblib.load(txpath)
+        X_tx = tx.transform(X)
+        col1,col2,col3 = st.columns(3)
+        with col1:
+            st.write("Predicted Carbon Intensity for the company: (Scope 1 and Scope 2)")
+            result = model.predict(X_tx)
+            st.metric(label="Carbon Intensity", value=round(result[0]))
+        with col2:
+            st.write("Predicted Carbon Emissions:")
+            st.metric(label="Carbon Emissions", value=round(result[0] * revenue))
+        with col3:
+            st.write("Something else")
