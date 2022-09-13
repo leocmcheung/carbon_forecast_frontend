@@ -56,8 +56,6 @@ else:
         sector_list, index=5, help="What is your company's GCIS Sector?")
 
 
-
-
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -1148,13 +1146,22 @@ else:
 
         tx = joblib.load(txpath)
         X_tx = tx.transform(X)
-        col1,col2,col3 = st.columns(3)
+        result = model.predict(X_tx)
+        c_abs = round(result[0] * revenue)
+        col1,col2,col3,col4 = st.columns(4)
         with col1:
             st.write("Predicted Carbon Intensity for the company: (Scope 1 and Scope 2)")
-            result = model.predict(X_tx)
-            st.metric(label="Carbon Intensity", value=round(result[0]))
+            st.metric(label="Carbon Intensity", value="{:.2f}".format(result[0]))
+            st.write("tonnes per $mn revenue")
         with col2:
             st.write("Predicted Carbon Emissions:")
-            st.metric(label="Carbon Emissions", value=round(result[0] * revenue))
+            st.metric(label="Carbon Emissions", value=c_abs)
+            st.write("tonnes")
         with col3:
-            st.write("Something else")
+            st.write("That's equivalent to...")
+            st.metric(label="Driving", value=c_abs*6000)
+            st.write("km with a diesel car")
+        with col4:
+            st.write("And...")
+            st.metric(label="Powering up", value=c_abs*0.309*3811)
+            st.write("homes per year")
