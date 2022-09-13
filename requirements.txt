@@ -3,3 +3,4 @@ pandas
 scikit-learn
 streamlit
 xgboost==1.6.2
+dill #something that's required for joblib
