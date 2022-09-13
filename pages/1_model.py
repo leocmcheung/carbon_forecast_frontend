@@ -5,6 +5,7 @@ import os
 from xgboost import XGBRegressor
 import numpy as np
 import joblib
+import pickle
 
 st.set_page_config(layout="wide")
 
@@ -29,7 +30,7 @@ model.load_model(modelpath)
 # X_test = pd.read_csv(filepath)
 col1,col2 = st.columns([4,1])
 with col2:
-    st.selectbox("Presets", ("","Company 1","Company 2", "Company 3"))
+    preset = st.selectbox("Presets", ("","Company 1","Company 2", "Company 3"))
 
 sector = st.selectbox("Select company sector:",
         ('','Communication Services',
@@ -1916,6 +1917,7 @@ X[secrev1] = secrev_pc1/100
 X[secrev2] = secrev_pc2/100
 X[secrev3] = secrev_pc3/100
 if st.button('Calculate!'):
+
     tx = joblib.load(txpath)
     X_tx = tx.transform(X)
     st.write("Here is the prediction for the company:")
