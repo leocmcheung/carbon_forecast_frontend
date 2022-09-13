@@ -6,6 +6,9 @@ from xgboost import XGBRegressor
 import numpy as np
 import joblib
 
+st.set_page_config(layout="wide")
+
+
 # filepath = os.path.abspath("model/X_test_tx.csv")
 # modelpath = os.path.abspath("model/test3.sav")
 # ypath = os.path.abspath("model/y_test.csv")
