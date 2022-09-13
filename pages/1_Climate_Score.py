@@ -954,9 +954,16 @@ X=pd.DataFrame({'Sector':[sector],
  'Wood container and pallet manufacturing':0.,
  'Wood kitchen cabinet and countertop manufacturing':0.,
  'Wood windows and doors and millwork':0.})
-X[secrev1] = secrev_pc1/100
-X[secrev2] = secrev_pc2/100
-X[secrev3] = secrev_pc3/100
+if secrev1 != "":
+    X[secrev1] = secrev_pc1/100
+if secrev2 != "":
+    X[secrev2] = secrev_pc2/100
+if secrev3 != "":
+    X[secrev3] = secrev_pc3/100
 st.write("The input looks like this", X)
+st.write(X.shape)
 st.write("Waiting for model from Nadir :)")
-##
+c_score = 70
+if 'c_score' not in st.session_state:
+    st.session_state['key'] = c_score
+st.session_state
