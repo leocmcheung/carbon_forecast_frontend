@@ -1165,3 +1165,4 @@ else:
             st.write("And...")
             st.metric(label="Powering up", value=c_abs*0.309*3811)
             st.write("homes per year")
+##
