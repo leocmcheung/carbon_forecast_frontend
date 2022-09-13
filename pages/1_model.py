@@ -27,6 +27,9 @@ model.load_model(modelpath)
 # st.write(type(model))
 ## enter input as boxes ideally but can just use one line of our data first
 # X_test = pd.read_csv(filepath)
+col1,col2 = st.columns([4,1])
+with col2:
+    st.selectbox("Presets", ("","Company 1","Company 2", "Company 3"))
 
 sector = st.selectbox("Select company sector:",
         ('','Communication Services',
@@ -39,21 +42,21 @@ sector = st.selectbox("Select company sector:",
  'Information Technology',
  'Materials',
  'Real Estate',
- 'Utilities'))
+ 'Utilities'), index=5)
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    revenue = st.number_input('Insert company revenue')
+    revenue = st.number_input('Insert company revenue', value=500000)
     st.write('The revenue is ', round(revenue,0))
 
 
 with col2:
-    employees = st.number_input('Insert number of employees')
+    employees = st.number_input('Insert number of employees', value=2000)
     st.write('Employee number is ', round(employees,0))
 
 with col3:
-    ev = st.number_input('Insert Enterprise Value')
+    ev = st.number_input('Insert Enterprise Value', value=5000)
     st.write('Enterprise Value is ', round(ev,0))
 
 with col1:
@@ -65,7 +68,7 @@ with col2:
     st.write('% Disclosures is ', round(disclosure,0))
 
 with col3:
-    pe = st.number_input('Insert P/E Ratio')
+    pe = st.number_input('Insert P/E Ratio', value=10.0)
     st.write('P/E Ratio is ', round(pe,0))
 
 if sector == "Energy":
@@ -85,7 +88,8 @@ if sector == "Energy":
         uds_rev = st.number_input("Ultra Deep Sea Drilling %:")
     with col7:
         thr_rev = st.number_input("Thermal Coal %:")
-
+    if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
+        st.write("Total Revenue % should not be over 100% :)")
 
 col1,col2 = st.columns([3,1])
 with col1:
@@ -991,7 +995,7 @@ with col1:
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork'))
 with col2:
-    secrev_pc2 = st.slider("Percentage:", 0, 100, 33, key="secrev2")
+    secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
 # if secrev2 !='':
 #     st.write('You selected:', secrev2, 'at', secrev_pc2, '%')
 col1,col2 = st.columns([3,1])
@@ -1447,7 +1451,8 @@ with col2:
     secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 # if secrev3 !='':
 #     st.write('You selected:', secrev3, 'at', secrev_pc3, '%')
-
+if secrev_pc1+secrev_pc2+secrev_pc3 > 100.0:
+    st.write("The sector revenue % should not be over 100% :)")
 X = pd.DataFrame({"Sector":[sector],
                 'Employees / Revenue':employees/revenue if revenue!=0 else 0,
                 'EV / Revenue':ev/revenue if revenue!=0 else 0,
