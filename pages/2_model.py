@@ -1159,10 +1159,10 @@ else:
             st.write("tonnes")
         with col3:
             st.write("That's equivalent to...")
-            st.metric(label="Driving", value=c_abs*6000)
+            st.metric(label="Driving", value=c_abs* 6000)
             st.write("km with a diesel car")
         with col4:
-            st.write("And...")
-            st.metric(label="Powering up", value=c_abs*0.309*3811)
-            st.write("homes per year")
+            st.write("Or...")
+            st.metric(label="Powering up", value=round(c_abs/2.6))
+            st.write("homes a year")
 ##
