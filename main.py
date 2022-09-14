@@ -15,10 +15,11 @@ with st.sidebar.container():
     for i in range(25):
         st.write("")
     st.image("images/green-wagon.png")
-st.title("Forecasting carbon emissions to limit global warming")
+st.title("Estimating company carbon emissions")
 
-st.write("Some texts on global warming")
+st.write("To start reducing carbon emissions, it is essential to understand how much we are emitting today. Corporate disclosure of greenhouse gas emissions is increasing but remain uncommon in all but a few sectors.")
 
-st.write("Some texts on our methodology")
+st.write("With our carbon estimator, you can calculate the total emissions and emission intensity (tonnes of carbon divided by revenue) of any company")
 
-st.write("Some explanation on our model")
+st.write("This carbon estimator is built from a machine learning model (XGBoost): using features such as revenue, number of employees,\
+   percentage revenue from different activities, and other financial metrics, the model predicts the carbon intensity of the company.")
