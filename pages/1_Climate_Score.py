@@ -486,10 +486,15 @@ CSS = """
 .st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
     font-size:14px;
 }
+
 """
 
 
 st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+
+
+
+
 hide_img_fs = '''
 <style>
 button[title="View fullscreen"]{
