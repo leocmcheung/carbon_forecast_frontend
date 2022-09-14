@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
-st.set_page_config(layout="wide")
+import joblib
+import os
+from PIL import Image
+st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 st.title("Find your company's Climate Strategy Score 🏁")
 
@@ -459,22 +462,129 @@ secrev_list = ( '', 'Abrasive product manufacturing',
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork')
+CSS = """
 
-col1, space, col2, col3 = st.columns([15,3,20,8])
+.css-1bim6c1{
+    font-size:20px;
+}
+.st-af{
+    font-size:18px;
+}
+.css-1inwz65{
+    font-size:18px;
+}
+.css-17ogifi{
+    font-size:18px;
+    top:-28px;
+}
+[data-baseweb="select"] {
+    font-size:20px;
+    }
+#.css-1bim6c1.effi0qh3 {
+    font-size:14px
+}
+.st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
+    font-size:14px;
+}
+
+"""
+
+
+st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+
+
+
+
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
+with st.sidebar.container():
+    for i in range(25):
+        st.write("")
+    st.image("images/green-wagon.png")
+
+imgwidth=66
+preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "An IT company - LeWagon!", "Custom"), index=3)
+col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
+
+
+
+if preset == "A Financials company":
+    sector_pre = 5
+    revenue_pre = 3000
+    employees_pre = 40000
+    secrev1_pre =149
+    secrev2_pre = 194
+    secrev3_pre = 234
+    secrevpc1_pre = 60
+    secrevpc2_pre = 27
+elif preset == "An Industrial company":
+    sector_pre = 7
+    revenue_pre = 10000
+    employees_pre = 200000
+    secrev1_pre =79
+    secrev2_pre = 396
+    secrev3_pre = 248
+    secrevpc1_pre = 45
+    secrevpc2_pre = 36
+elif preset == "An IT company - LeWagon!":
+    sector_pre = 8
+    revenue_pre = 1000
+    employees_pre = 24000
+    secrev1_pre =194
+    secrev2_pre = 29
+    secrev3_pre = 319
+    secrevpc1_pre = 60
+    secrevpc2_pre = 27
+else:
+    sector_pre = 0
+    revenue_pre = 0
+    employees_pre = 0
+    secrev1_pre =0
+    secrev2_pre = 0
+    secrev3_pre = 0
+    secrevpc1_pre = 34
+    secrevpc2_pre = round((100-secrevpc1_pre)/2)
 
 with col1:
-    sector = st.selectbox("Company's GCIS sector:",
-            sector_list, index=5, help="What is your company's GCIS Sector?")
-    revenue = st.number_input('Insert company revenue ($mn)', value=100)
-    employees = st.number_input('Insert number of employees', value=2000, step=10)
-with col2:
-    secrev1 = st.selectbox('Sector Revenue #1', secrev_list)
-    secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
-    secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
+    sector = st.selectbox("Company Sector:",
+                sector_list, index=sector_pre, help="What is your company's GCIS Sector?")
+    revenue = st.number_input('Annual Revenue ($mn)', value=revenue_pre)
+    employees = st.number_input('Number of Employees', value=employees_pre, step=10)
 
+with col1img:
+    sec_img = Image.open(os.path.abspath("images/company.png"))
+    st.image(sec_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    rev_img = Image.open(os.path.abspath("images/sales-performance--v5.png"))
+    st.image(rev_img, width=imgwidth)
+    st.text("")
+    emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
+    st.image(emp_img,width=imgwidth)
+with col2:
+    secrev1 = st.selectbox('Sector Revenue #1',secrev_list, index=secrev1_pre)
+    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev2_pre)
+    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev3_pre)
+with col2img:
+    sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec1_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    sec2_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec2_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec3_img,width=imgwidth)
 with col3:
-    secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
-    secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
+    secrev_pc1 = st.slider("Percentage:", 0, 100, secrevpc1_pre, key="secrev1")
+    secrev_pc2 = st.slider("Percentage:", 0, 100, secrevpc2_pre, key="secrev2")
     secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 
 if sector == "Energy":
@@ -954,9 +1064,27 @@ X=pd.DataFrame({'Sector':[sector],
  'Wood container and pallet manufacturing':0.,
  'Wood kitchen cabinet and countertop manufacturing':0.,
  'Wood windows and doors and millwork':0.})
-X[secrev1] = secrev_pc1/100
-X[secrev2] = secrev_pc2/100
-X[secrev3] = secrev_pc3/100
+if secrev1 != "":
+    X[secrev1] = secrev_pc1/100
+if secrev2 != "":
+    X[secrev2] = secrev_pc2/100
+if secrev3 != "":
+    X[secrev3] = secrev_pc3/100
 st.write("The input looks like this", X)
+st.write(X.shape)
 st.write("Waiting for model from Nadir :)")
-##
+c_score = 70
+if 'c_score' not in st.session_state:
+    st.session_state['c_score'] = c_score
+st.write("C score placeholder:", st.session_state.c_score)
+
+if st.button('Calculate!'):
+    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
+    X_tx = tx.transform(X)
+    pca = joblib.load(os.path.abspath("model/pca.pkl"))
+    X_pca = pca.transform(X_tx)
+    st.write(X_pca)
+    # model = joblib.load(os.path.abspath("model/kmeans.pkl"))
+    # result = model.predict(X_pca)
+    # st.write(result)
+    # st.write("Calculation should appear here")
