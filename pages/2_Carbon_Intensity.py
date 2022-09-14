@@ -7,9 +7,11 @@ import numpy as np
 import joblib
 import pickle
 import locale
-locale.setlocale(locale.LC_ALL, '')
-st.set_page_config(layout="wide")
 from PIL import Image
+
+
+locale.setlocale(locale.LC_ALL, '')
+st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 # filepath = os.path.abspath("model/X_test_tx.csv")
 # modelpath = os.path.abspath("model/test3.sav")
@@ -529,7 +531,7 @@ col1,col2 = st.columns([4,1])
 with col1:
     st.header("Basic Metrics of your company")
 with col2:
-    preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company"))
+    preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company",""))
 
 
 

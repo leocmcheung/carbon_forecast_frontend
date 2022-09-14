@@ -2,14 +2,13 @@ from re import S
 import streamlit as st
 # from streamlit_option_menu import option_menu
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 # with st.sidebar:
 #     selected = option_menu("Main Menu", ["Home", "Climate Score", "Carbon Intensity"],
 #         default_index=0)
 #     st.write(f"You are now on: {selected}")
 #     if selected == "Climate Score":
 #         pass
-
 
 
 with st.sidebar.container():
