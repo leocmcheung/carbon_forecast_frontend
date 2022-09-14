@@ -583,9 +583,9 @@ with col2img:
     sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec3_img,width=imgwidth)
 with col3:
-    secrev_pc1 = st.slider("Percentage:", 0, 100, secrevpc1_pre, key="secrev1")
-    secrev_pc2 = st.slider("Percentage:", 0, 100, secrevpc2_pre, key="secrev2")
-    secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
+    secrev_pc1 = st.slider("Percentage:", 0, 100, secrevpc1_pre, key="secrev001")
+    secrev_pc2 = st.slider("Percentage:", 0, 100, secrevpc2_pre, key="secrev002")
+    secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev003")
 
 if sector == "Energy":
     st.write("(For energy companies only) Revenue % for:")
@@ -1070,21 +1070,36 @@ if secrev2 != "":
     X[secrev2] = secrev_pc2/100
 if secrev3 != "":
     X[secrev3] = secrev_pc3/100
-st.write("The input looks like this", X)
-st.write(X.shape)
-st.write("Working the model with Nadir :) - TBC")
-c_score = 70
-if 'c_score' not in st.session_state:
-    st.session_state['c_score'] = c_score
-st.write("C score placeholder:", st.session_state.c_score)
-
+# st.write("The input looks like this", X)
+# st.write(X.shape)
+# st.write("Working the model with Nadir :) - TBC")
+# c_score = 70
+# if 'c_score' not in st.session_state:
+#     st.session_state['c_score'] = c_score
+# st.write("C score placeholder:", st.session_state.c_score)
+for key in st.session_state.keys():
+        del st.session_state[key]
 if st.button('Calculate!'):
     tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
     X_tx = tx.transform(X)
     pca = joblib.load(os.path.abspath("model/pca.pkl"))
     X_pca = pca.transform(X_tx)
-    st.write(X_pca)
     model = joblib.load(os.path.abspath("model/kmeans.pkl"))
     result = model.predict(X_pca)
-    # st.write(result)
-    # st.write("Calculation should appear here")
+    df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
+    c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
+
+    st.session_state['c_score'] = c_score
+    st.write("The Climate Strategy Score for your Company is ", st.session_state.c_score)
+
+
+    st.session_state['sector'] = sector
+    st.session_state['revenue'] = revenue
+    st.session_state['employees'] = employees
+    st.session_state['secrev1'] = secrev1
+    st.session_state['secrev2'] = secrev2
+    st.session_state['secrev3'] = secrev3
+    st.session_state['secrev_pc1'] = secrev_pc1
+    st.session_state['secrev_pc2'] = secrev_pc2
+
+    # st.session_state

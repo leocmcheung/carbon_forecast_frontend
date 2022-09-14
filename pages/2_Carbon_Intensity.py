@@ -526,6 +526,8 @@ secrev_list = ( '', 'Abrasive product manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork')
 
+ss = st.session_state
+
 
 col1,col2 = st.columns([4,1])
 with col1:
@@ -538,42 +540,18 @@ with col2:
 col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
 imgwidth = 66
 with col1:
-    if preset == "An Industrial company":
-        sector = st.selectbox("Company Sector:",
-            sector_list, index=7, help="What is your company's GCIS Sector?")
-    elif preset == "A Financials company":
-        sector = st.selectbox("Company Sector:",
-            sector_list, index=5, help="What is your company's GCIS Sector?")
-    elif preset == "An IT company":
-        sector = st.selectbox("Company Sector:",
-            sector_list, index=8, help="What is your company's GCIS Sector?")
-    else:
-        sector = st.selectbox("Company Sector:",
-            sector_list, index=5, help="What is your company's GCIS Sector?")
+    sector = st.selectbox("Company Sector:",
+        sector_list, index=sector_list.index(ss.sector) if "sector" in ss else 0, help="What is your company's GCIS Sector?")
 with col1img:
     rev_img = Image.open(os.path.abspath("images/company.png"))
     st.image(rev_img, width=imgwidth)
 with col2:
-    if preset == "An Industrial company":
-        revenue = st.number_input('Annual Revenue ($mn)', value=10000)
-    elif preset == "A Financials company":
-        revenue = st.number_input('Annual Revenue ($mn)', value=3000)
-    elif preset == "An IT company":
-        revenue = st.number_input('Annual Revenue ($mn)', value=1000)
-    else:
-        revenue = st.number_input('Annual Revenue ($mn)', value=100)
+    revenue = st.number_input('Annual Revenue ($mn)', value=ss.revenue if "revenue" in ss else 0)
 with col2img:
     rev_img = Image.open(os.path.abspath("images/sales-performance--v5.png"))
     st.image(rev_img, width=imgwidth)
 with col3:
-    if preset == "An Industrial company":
-        employees = st.number_input('Number of Employees', value=200000)
-    elif preset == "A Financials company":
-        employees = st.number_input('Number of Employees', value=40000)
-    elif preset == "A Financials company":
-        employees = st.number_input('Number of Employees', value=24000)
-    else:
-        employees = st.number_input('Number of Employees', value=2000)
+    employees = st.number_input('Number of Employees', value=ss.employees if "employees" in ss else 0)
 with col3img:
     emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
     st.image(emp_img,width=imgwidth)
@@ -595,15 +573,8 @@ with col1img:
     ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
     st.image(ev_img,width=imgwidth)
 with col2:
-    if preset == "An Industrial company":
-        c_score = st.slider('Climate Strategy Score', 0, 100, 20)
-    elif preset == "A Financials company":
-        c_score = st.slider('Climate Strategy Score', 0, 100, 87)
-    elif preset == "An IT company":
-        c_score = st.slider('Climate Strategy Score', 0, 100, 74)
-    else:
-        c_score = st.slider('Climate Strategy Score', 0, 100,
-            st.session_state.c_score if "c_score" in st.session_state else 50)
+    c_score = st.slider('Climate Strategy Score', 0, 100,
+            round(float(ss.c_score)) if "c_score" in ss else 50)
 with col2img:
     cs_img = Image.open(os.path.abspath("images/climate-care.png"))
     st.image(cs_img,width=imgwidth)
@@ -652,78 +623,30 @@ st.write("")
 st.header("Sector Revenues of your company")
 st.write("")
 col1,colimg,col2 = st.columns([2.5,0.3,1.5])
-if preset == "An Industrial company":
-    with col1:
-        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=79)
-    with col2:
-        secrev_pc1 = st.slider("Percentage:", 0, 100, 45, key="secrev1")
+with col1:
+    secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=secrev_list.index(ss.secrev1) if "secrev1" in ss else 0)
+with col2:
+    secrev_pc1 = st.slider("Percentage #1:", 0, 100, ss.secrev_pc1 if "secrev_pc1" in ss else 34)
 
-elif preset == "A Financials company":
-    with col1:
-        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=149)
-    with col2:
-        secrev_pc1 = st.slider("Percentage:", 0, 100, 60, key="secrev1")
-
-elif preset == "An IT company":
-    with col1:
-        secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=194)
-    with col2:
-        secrev_pc1 = st.slider("Percentage:", 0, 100, 58, key="secrev1")
-
-else:
-    with col1:
-        secrev1 = st.selectbox('Sector Revenue #1', secrev_list)
-    with col2:
-        secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
 with colimg:
     sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec1_img,width=imgwidth+16)
 col1,colimg,col2 = st.columns([2.5,0.3,1.5])
-if preset == "An Industrial company":
-    with col1:
-        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=396)
-    with col2:
-        secrev_pc2 = st.slider("Percentage:", 0, 100, 36, key="secrev2")
-elif preset == "A Financials company":
-    with col1:
-        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=194)
-    with col2:
-        secrev_pc2 = st.slider("Percentage:", 0, 100, 27, key="secrev2")
-elif preset == "An IT company":
-    with col1:
-        secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=29)
-    with col2:
-        secrev_pc2 = st.slider("Percentage:", 0, 100, 34, key="secrev2")
-else:
-    with col1:
-        secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
-    with col2:
-        secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
+with col1:
+    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev_list.index(ss.secrev2) if "secrev2" in ss else 0)
+with col2:
+    secrev_pc2 = st.slider("Percentage #2:", 0, 100, ss.secrev_pc2 if "secrev_pc2" in ss else round((100-secrev_pc1)/2))
+
 with colimg:
     sec2_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec2_img,width=imgwidth+16)
 
 col1,colimg,col2 = st.columns([2.5,0.3,1.5])
-if preset == "An Industrial company":
-    with col1:
-        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=248)
-    with col2:
-        secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-elif preset == "A Financials company":
-    with col1:
-        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=234)
-    with col2:
-        secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-elif preset == "An IT company":
-    with col1:
-        secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=319)
-    with col2:
-        secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-else:
-    with col1:
-        secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
-    with col2:
-        secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
+with col1:
+    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev_list.index(ss.secrev3) if "secrev3" in ss else 0)
+with col2:
+    secrev_pc3 = st.slider("Percentage #3:", 0, 100, 100-secrev_pc1-secrev_pc2)
+
 with colimg:
     sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec3_img,width=imgwidth+16)
