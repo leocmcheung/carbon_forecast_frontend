@@ -47,6 +47,20 @@ CSS = """
 
 st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
 
+
+with st.sidebar.container():
+    for i in range(25):
+        st.write("")
+    st.image("images/green-wagon.png")
+
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
 ## load pickle
 # loaded = XGBRegressor()
 # with open(modelpath,"rb") as f:
@@ -539,13 +553,13 @@ with col1img:
     st.image(rev_img, width=imgwidth)
 with col2:
     if preset == "An Industrial company":
-        revenue = st.number_input('Company Revenue ($mn)', value=10000)
+        revenue = st.number_input('Annual Revenue ($mn)', value=10000)
     elif preset == "A Financials company":
-        revenue = st.number_input('Company Revenue ($mn)', value=3000)
+        revenue = st.number_input('Annual Revenue ($mn)', value=3000)
     elif preset == "An IT company":
-        revenue = st.number_input('Company Revenue ($mn)', value=1000)
+        revenue = st.number_input('Annual Revenue ($mn)', value=1000)
     else:
-        revenue = st.number_input('Company Revenue ($mn)', value=100)
+        revenue = st.number_input('Annual Revenue ($mn)', value=100)
 with col2img:
     rev_img = Image.open(os.path.abspath("images/sales-performance--v5.png"))
     st.image(rev_img, width=imgwidth)
@@ -576,8 +590,8 @@ with col1:
     else:
         ev = st.number_input('Enterprise Value ($mn)', value=5000)
 with col1img:
-    emp_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
-    st.image(emp_img,width=imgwidth)
+    ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
+    st.image(ev_img,width=imgwidth)
 with col2:
     if preset == "An Industrial company":
         c_score = st.slider('Climate Strategy Score', 0, 100, 20)
@@ -589,8 +603,8 @@ with col2:
         c_score = st.slider('Climate Strategy Score', 0, 100,
             st.session_state.c_score if "c_score" in st.session_state else 50)
 with col2img:
-    emp_img = Image.open(os.path.abspath("images/climate-care.png"))
-    st.image(emp_img,width=imgwidth)
+    cs_img = Image.open(os.path.abspath("images/climate-care.png"))
+    st.image(cs_img,width=imgwidth)
 
 with col3:
     if preset == "An Industrial company":
@@ -602,8 +616,8 @@ with col3:
     else:
         pe = st.number_input('P/E Ratio', value=10.0)
 with col3img:
-    emp_img = Image.open(os.path.abspath("images/percentage-growth.png"))
-    st.image(emp_img,width=imgwidth)
+    pe_img = Image.open(os.path.abspath("images/percentage-growth.png"))
+    st.image(pe_img,width=imgwidth)
 
 
 ene_err = False
@@ -660,8 +674,8 @@ else:
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
 with colimg:
-    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
-    st.image(emp_img,width=imgwidth+16)
+    sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec1_img,width=imgwidth+16)
 col1,colimg,col2 = st.columns([2.5,0.3,1.5])
 if preset == "An Industrial company":
     with col1:
@@ -684,8 +698,8 @@ else:
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
 with colimg:
-    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
-    st.image(emp_img,width=imgwidth+16)
+    sec2_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec2_img,width=imgwidth+16)
 
 col1,colimg,col2 = st.columns([2.5,0.3,1.5])
 if preset == "An Industrial company":
@@ -709,8 +723,8 @@ else:
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
 with colimg:
-    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
-    st.image(emp_img,width=imgwidth+16)
+    sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec3_img,width=imgwidth+16)
 
 
 secrev_err = False

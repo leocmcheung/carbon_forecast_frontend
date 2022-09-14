@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
+from PIL import Image
 st.set_page_config(layout="wide")
 
 st.title("Find your company's Climate Strategy Score 🏁")
@@ -461,19 +462,80 @@ secrev_list = ( '', 'Abrasive product manufacturing',
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork')
+CSS = """
 
-col1, space, col2, col3 = st.columns([15,3,20,8])
+.css-1bim6c1{
+    font-size:20px;
+}
+.st-af{
+    font-size:18px;
+}
+.css-1inwz65{
+    font-size:18px;
+}
+.css-17ogifi{
+    font-size:18px;
+    top:-28px;
+}
+[data-baseweb="select"] {
+    font-size:20px;
+    }
+#.css-1bim6c1.effi0qh3 {
+    font-size:14px
+}
+.st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
+    font-size:14px;
+}
+"""
+
+
+st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
+with st.sidebar.container():
+    for i in range(25):
+        st.write("")
+    st.image("images/green-wagon.png")
+
+imgwidth=66
+col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
 
 with col1:
-    sector = st.selectbox("Company's GCIS sector:",
+    sector = st.selectbox("Company Sector:",
             sector_list, index=5, help="What is your company's GCIS Sector?")
-    revenue = st.number_input('Insert company revenue ($mn)', value=100)
-    employees = st.number_input('Insert number of employees', value=2000, step=10)
+    revenue = st.number_input('Annual Revenue ($mn)', value=100)
+    employees = st.number_input('Number of Employees', value=2000, step=10)
+with col1img:
+    sec_img = Image.open(os.path.abspath("images/company.png"))
+    st.image(sec_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    rev_img = Image.open(os.path.abspath("images/sales-performance--v5.png"))
+    st.image(rev_img, width=imgwidth)
+    st.text("")
+    emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
+    st.image(emp_img,width=imgwidth)
 with col2:
     secrev1 = st.selectbox('Sector Revenue #1',secrev_list)
     secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
     secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
-
+with col2img:
+    sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec1_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    sec2_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec2_img, width=imgwidth)
+    st.text("")
+    st.text("")
+    sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(sec3_img,width=imgwidth)
 with col3:
     secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
     secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
