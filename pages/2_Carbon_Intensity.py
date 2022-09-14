@@ -16,9 +16,9 @@ st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by S
 # filepath = os.path.abspath("model/X_test_tx.csv")
 # modelpath = os.path.abspath("model/test3.sav")
 # ypath = os.path.abspath("model/y_test.csv")
-txpath = os.path.abspath("model/transformer_0914.pkl")
-modelpath = os.path.abspath("model/model_0914.json")
-pcapath = os.path.abspath("model/pca_0914.pkl")
+txpath = os.path.abspath("model/tx_norevenue_0914.pkl")
+modelpath = os.path.abspath("model/model_norevenue_0914.json")
+pcapath = os.path.abspath("model/pca_norevenue_0914.pkl")
 st.title("Predict how much annual carbon emission your company has")
 CSS = """
 
