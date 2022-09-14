@@ -42,11 +42,11 @@ CSS = """
 .st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
     font-size:14px;
 }
+
 """
 
 
 st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
-
 
 with st.sidebar.container():
     for i in range(25):
