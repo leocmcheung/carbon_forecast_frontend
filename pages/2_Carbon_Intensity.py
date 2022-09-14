@@ -16,9 +16,9 @@ st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by S
 # filepath = os.path.abspath("model/X_test_tx.csv")
 # modelpath = os.path.abspath("model/test3.sav")
 # ypath = os.path.abspath("model/y_test.csv")
-txpath = os.path.abspath("model/c_int_tx.pkl")
-modelpath = os.path.abspath("model/c_int_model.json")
-pcapath = os.path.abspath("model/c_int_pca.pkl")
+txpath = os.path.abspath("model/transformer_0914.pkl")
+modelpath = os.path.abspath("model/model_0914.json")
+pcapath = os.path.abspath("model/pca_0914.pkl")
 st.title("Predict how much annual carbon emission your company has")
 CSS = """
 
@@ -560,18 +560,18 @@ st.text("")
 st.text("")
 
 col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
-with col1:
-    if preset == "An Industrial company":
-        ev = st.number_input('Enterprise Value ($mn)', value=15000)
-    elif preset == "A Financials company":
-        ev = st.number_input('Enterprise Value ($mn)', value=18000)
-    elif preset == "An IT company":
-        ev = st.number_input('Enterprise Value ($mn)', value=20000)
-    else:
-        ev = st.number_input('Enterprise Value ($mn)', value=5000)
-with col1img:
-    ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
-    st.image(ev_img,width=imgwidth)
+# with col1:
+#     if preset == "An Industrial company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=15000)
+#     elif preset == "A Financials company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=18000)
+#     elif preset == "An IT company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=20000)
+#     else:
+#         ev = st.number_input('Enterprise Value ($mn)', value=5000)
+# with col1img:
+#     ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
+#     st.image(ev_img,width=imgwidth)
 with col2:
     c_score = st.slider('Climate Strategy Score', 0, 100,
             round(float(ss.c_score)) if "c_score" in ss else 50)
@@ -579,18 +579,18 @@ with col2img:
     cs_img = Image.open(os.path.abspath("images/climate-care.png"))
     st.image(cs_img,width=imgwidth)
 
-with col3:
-    if preset == "An Industrial company":
-        pe = st.number_input('P/E Ratio', value=11.2)
-    elif preset == "A Financials company":
-        pe = st.number_input('P/E Ratio', value=12.6)
-    elif preset == "An IT company":
-        pe = st.number_input('P/E Ratio', value=19.8)
-    else:
-        pe = st.number_input('P/E Ratio', value=10.0)
-with col3img:
-    pe_img = Image.open(os.path.abspath("images/percentage-growth.png"))
-    st.image(pe_img,width=imgwidth)
+# with col3:
+#     if preset == "An Industrial company":
+#         pe = st.number_input('P/E Ratio', value=11.2)
+#     elif preset == "A Financials company":
+#         pe = st.number_input('P/E Ratio', value=12.6)
+#     elif preset == "An IT company":
+#         pe = st.number_input('P/E Ratio', value=19.8)
+#     else:
+#         pe = st.number_input('P/E Ratio', value=10.0)
+# with col3img:
+#     pe_img = Image.open(os.path.abspath("images/percentage-growth.png"))
+#     st.image(pe_img,width=imgwidth)
 
 
 ene_err = False
@@ -661,10 +661,10 @@ if secrev_pc1+secrev_pc2+secrev_pc3 > 100.0:
     secrev_err = True
 X = pd.DataFrame({"Sector":[sector],
                 'Employees / Revenue':employees/revenue if revenue!=0 else 0,
-                'EV / Revenue':ev/revenue if revenue!=0 else 0,
+                # 'EV / Revenue':ev/revenue if revenue!=0 else 0,
                 'climate_strategy_score':c_score,
                 'disclosure':0.,
- 'pe_rat':pe,
+#  'pe_rat':pe,
  'revenue':revenue,
  'nuclear_percentage_revenue':nuc_rev if sector == "Energy" else 0.,
  'thermal_coal_percentage_revenue':thr_rev if sector == "Energy" else 0.,
