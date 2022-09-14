@@ -1072,7 +1072,7 @@ if secrev3 != "":
     X[secrev3] = secrev_pc3/100
 st.write("The input looks like this", X)
 st.write(X.shape)
-st.write("Waiting for model from Nadir :)")
+st.write("Working the model with Nadir :) - TBC")
 c_score = 70
 if 'c_score' not in st.session_state:
     st.session_state['c_score'] = c_score
@@ -1084,7 +1084,7 @@ if st.button('Calculate!'):
     pca = joblib.load(os.path.abspath("model/pca.pkl"))
     X_pca = pca.transform(X_tx)
     st.write(X_pca)
-    # model = joblib.load(os.path.abspath("model/kmeans.pkl"))
-    # result = model.predict(X_pca)
+    model = joblib.load(os.path.abspath("model/kmeans.pkl"))
+    result = model.predict(X_pca)
     # st.write(result)
     # st.write("Calculation should appear here")
