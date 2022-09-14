@@ -9,7 +9,7 @@ import pickle
 import locale
 locale.setlocale(locale.LC_ALL, '')
 st.set_page_config(layout="wide")
-
+from PIL import Image
 
 # filepath = os.path.abspath("model/X_test_tx.csv")
 # modelpath = os.path.abspath("model/test3.sav")
@@ -18,6 +18,34 @@ txpath = os.path.abspath("model/c_int_tx.pkl")
 modelpath = os.path.abspath("model/c_int_model.json")
 pcapath = os.path.abspath("model/c_int_pca.pkl")
 st.title("Predict how much annual carbon emission your company has")
+CSS = """
+
+.css-1bim6c1{
+    font-size:20px;
+}
+.st-af{
+    font-size:18px;
+}
+.css-1inwz65{
+    font-size:18px;
+}
+.css-17ogifi{
+    font-size:18px;
+    top:-28px;
+}
+[data-baseweb="select"] {
+    font-size:20px;
+    }
+#.css-1bim6c1.effi0qh3 {
+    font-size:14px
+}
+.st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
+    font-size:14px;
+}
+"""
+
+
+st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
 
 ## load pickle
 # loaded = XGBRegressor()
@@ -484,104 +512,105 @@ secrev_list = ( '', 'Abrasive product manufacturing',
 
 
 col1,col2 = st.columns([4,1])
-with col2:
-    preset = st.selectbox("Presets", ("","Company 1","Company 2", "Company 3"))
-
-
-if preset == "Company 1":
-    sector = st.selectbox("Select company sector:",
-        sector_list, index=4, help="What is your company's GCIS Sector?")
-elif preset == "Company 2":
-    sector = st.selectbox("Select company sector:",
-        sector_list, index=5, help="What is your company's GCIS Sector?")
-elif preset == "Company 3":
-    sector = st.selectbox("Select company sector:",
-        sector_list, index=8, help="What is your company's GCIS Sector?")
-else:
-    sector = st.selectbox("Select company sector:",
-        sector_list, index=5, help="What is your company's GCIS Sector?")
-
-
-col1, col2, col3 = st.columns(3)
-
 with col1:
-    if preset == "Company 1":
-        revenue = st.number_input('Insert company revenue ($mn)', value=10000)
-    elif preset == "Company 2":
-        revenue = st.number_input('Insert company revenue ($mn)', value=3000)
-    elif preset == "Company 3":
-        revenue = st.number_input('Insert company revenue ($mn)', value=1000)
-    else:
-        revenue = st.number_input('Insert company revenue ($mn)', value=100)
+    st.header("Basic Metrics of your company")
 with col2:
-    if preset == "Company 1":
-        employees = st.number_input('Insert number of employees', value=200000)
-    elif preset == "Company 2":
-        employees = st.number_input('Insert number of employees', value=40000)
-    elif preset == "Company 2":
-        employees = st.number_input('Insert number of employees', value=24000)
+    preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company"))
+
+
+
+col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
+imgwidth = 66
+with col1:
+    if preset == "An Industrial company":
+        sector = st.selectbox("Company Sector:",
+            sector_list, index=7, help="What is your company's GCIS Sector?")
+    elif preset == "A Financials company":
+        sector = st.selectbox("Company Sector:",
+            sector_list, index=5, help="What is your company's GCIS Sector?")
+    elif preset == "An IT company":
+        sector = st.selectbox("Company Sector:",
+            sector_list, index=8, help="What is your company's GCIS Sector?")
     else:
-        employees = st.number_input('Insert number of employees', value=2000)
+        sector = st.selectbox("Company Sector:",
+            sector_list, index=5, help="What is your company's GCIS Sector?")
+with col1img:
+    rev_img = Image.open(os.path.abspath("images/company.png"))
+    st.image(rev_img, width=imgwidth)
+with col2:
+    if preset == "An Industrial company":
+        revenue = st.number_input('Company Revenue ($mn)', value=10000)
+    elif preset == "A Financials company":
+        revenue = st.number_input('Company Revenue ($mn)', value=3000)
+    elif preset == "An IT company":
+        revenue = st.number_input('Company Revenue ($mn)', value=1000)
+    else:
+        revenue = st.number_input('Company Revenue ($mn)', value=100)
+with col2img:
+    rev_img = Image.open(os.path.abspath("images/sales-performance--v5.png"))
+    st.image(rev_img, width=imgwidth)
+with col3:
+    if preset == "An Industrial company":
+        employees = st.number_input('Number of Employees', value=200000)
+    elif preset == "A Financials company":
+        employees = st.number_input('Number of Employees', value=40000)
+    elif preset == "A Financials company":
+        employees = st.number_input('Number of Employees', value=24000)
+    else:
+        employees = st.number_input('Number of Employees', value=2000)
+with col3img:
+    emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
+    st.image(emp_img,width=imgwidth)
+st.text("")
+
+st.text("")
+
+col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
+with col1:
+    if preset == "An Industrial company":
+        ev = st.number_input('Enterprise Value ($mn)', value=15000)
+    elif preset == "A Financials company":
+        ev = st.number_input('Enterprise Value ($mn)', value=18000)
+    elif preset == "An IT company":
+        ev = st.number_input('Enterprise Value ($mn)', value=20000)
+    else:
+        ev = st.number_input('Enterprise Value ($mn)', value=5000)
+with col1img:
+    emp_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
+    st.image(emp_img,width=imgwidth)
+with col2:
+    if preset == "An Industrial company":
+        c_score = st.slider('Climate Strategy Score', 0, 100, 20)
+    elif preset == "A Financials company":
+        c_score = st.slider('Climate Strategy Score', 0, 100, 87)
+    elif preset == "An IT company":
+        c_score = st.slider('Climate Strategy Score', 0, 100, 74)
+    else:
+        c_score = st.slider('Climate Strategy Score', 0, 100,
+            st.session_state.c_score if "c_score" in st.session_state else 50)
+with col2img:
+    emp_img = Image.open(os.path.abspath("images/climate-care.png"))
+    st.image(emp_img,width=imgwidth)
 
 with col3:
-    if preset == "Company 1":
-        ev = st.number_input('Insert Enterprise Value', value=15000)
-    elif preset == "Company 2":
-        ev = st.number_input('Insert Enterprise Value', value=18000)
-    elif preset == "Company 3":
-        ev = st.number_input('Insert Enterprise Value', value=20000)
+    if preset == "An Industrial company":
+        pe = st.number_input('P/E Ratio', value=11.2)
+    elif preset == "A Financials company":
+        pe = st.number_input('P/E Ratio', value=12.6)
+    elif preset == "An IT company":
+        pe = st.number_input('P/E Ratio', value=19.8)
     else:
-        ev = st.number_input('Insert Enterprise Value', value=5000)
+        pe = st.number_input('P/E Ratio', value=10.0)
+with col3img:
+    emp_img = Image.open(os.path.abspath("images/percentage-growth.png"))
+    st.image(emp_img,width=imgwidth)
 
-with col1:
-    if preset == "Company 1":
-        c_score = st.slider('Select Climate Strategy Score', 0, 100, 20)
-    elif preset == "Company 2":
-        c_score = st.slider('Select Climate Strategy Score', 0, 100, 87)
-    elif preset == "Company 3":
-        c_score = st.slider('Select Climate Strategy Score', 0, 100, 74)
-    else:
-        c_score = st.slider('Select Climate Strategy Score', 0, 100, st.session_state.key)
-# with col2:
-#     disclosure = st.slider('Insert % of Emission Disclosures', 0,100,50)
-#     st.write('% Disclosures is ', round(disclosure,0))
 
-with col2:
-    if preset == "Company 1":
-        pe = st.number_input('Insert P/E Ratio', value=11.2)
-    elif preset == "Company 2":
-        pe = st.number_input('Insert P/E Ratio', value=12.6)
-    elif preset == "Company 3":
-        pe = st.number_input('Insert P/E Ratio', value=19.8)
-    else:
-        pe = st.number_input('Insert P/E Ratio', value=10.0)
 ene_err = False
 if sector == "Energy":
     st.write("(For energy companies only) Revenue % for:")
-    col1,col2,col3,col4,col5,col6,col7 = st.columns(7)
-    if preset == "Company 1":
-        with col1:
-            arc_rev = st.number_input("Arctic Drilling %:",step=1.,value=5.)
-        with col2:
-            coal_rev = st.number_input("Coal %:",step=1., value=26.)
-        with col3:
-            nuc_rev = st.number_input("Nuclear %:",step=1., value=8.)
-        with col4:
-            oil_rev = st.number_input("Oil & Sands %:",step=1., value=4.)
-        with col5:
-            shale_rev = st.number_input("Shale Oil & Gas %:",step=1., value=30.)
-        with col6:
-            uds_rev = st.number_input("Ultra Deep Sea Drilling %:",step=1., value=15.)
-        with col7:
-            thr_rev = st.number_input("Thermal Coal %:",step=1.,value=12.)
-
-        st.write("Total input =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2), "%")
-        if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
-            pow_rev_warn = '<p style="color:Red; font-size: 16px;">Total Revenue % should not be over 100% :)</p>'
-            st.markdown(pow_rev_warn, unsafe_allow_html=True)
-            ene_err = True
-
-    else:
+    col1,col2,col3,col4,col5,col6,col7 = st.columns([1,1,1,1,1,1.2,1])
+    if preset == "An Industrial company":
         with col1:
             arc_rev = st.number_input("Arctic Drilling %:",step=1.)
         with col2:
@@ -599,24 +628,27 @@ if sector == "Energy":
         st.write("Total input % =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2))
         if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
             pow_rev_warn = '<p style="color:Red; font-size: 14px;">Total Revenue % should not be over 100% :)</p>'
-            st.markdown(pow_rev_warn, unsafe_allow_html=True)
             ene_err = True
 
-
-col1,col2 = st.columns([3,1])
-if preset == "Company 1":
+st.write("")
+st.write("")
+st.write("")
+st.header("Sector Revenues of your company")
+st.write("")
+col1,colimg,col2 = st.columns([2.5,0.3,1.5])
+if preset == "An Industrial company":
     with col1:
         secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=79)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 45, key="secrev1")
 
-elif preset == "Company 2":
+elif preset == "A Financials company":
     with col1:
         secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=149)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 60, key="secrev1")
 
-elif preset == "Company 3":
+elif preset == "An IT company":
     with col1:
         secrev1 = st.selectbox('Sector Revenue #1', secrev_list, index=194)
     with col2:
@@ -627,19 +659,21 @@ else:
         secrev1 = st.selectbox('Sector Revenue #1', secrev_list)
     with col2:
         secrev_pc1 = st.slider("Percentage:", 0, 100, 34, key="secrev1")
-
-col1,col2 = st.columns([3,1])
-if preset == "Company 1":
+with colimg:
+    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(emp_img,width=imgwidth+16)
+col1,colimg,col2 = st.columns([2.5,0.3,1.5])
+if preset == "An Industrial company":
     with col1:
         secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=396)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, 36, key="secrev2")
-elif preset == "Company 2":
+elif preset == "A Financials company":
     with col1:
         secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=194)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, 27, key="secrev2")
-elif preset == "Company 3":
+elif preset == "An IT company":
     with col1:
         secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=29)
     with col2:
@@ -649,20 +683,22 @@ else:
         secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
     with col2:
         secrev_pc2 = st.slider("Percentage:", 0, 100, round((100-secrev_pc1)/2), key="secrev2")
+with colimg:
+    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(emp_img,width=imgwidth+16)
 
-
-col1,col2 = st.columns([3,1])
-if preset == "Company 1":
+col1,colimg,col2 = st.columns([2.5,0.3,1.5])
+if preset == "An Industrial company":
     with col1:
         secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=248)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-elif preset == "Company 2":
+elif preset == "A Financials company":
     with col1:
         secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=234)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
-elif preset == "Company 3":
+elif preset == "An IT company":
     with col1:
         secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=319)
     with col2:
@@ -672,8 +708,14 @@ else:
         secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
     with col2:
         secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev3")
+with colimg:
+    emp_img = Image.open(os.path.abspath("images/tree-structure.png"))
+    st.image(emp_img,width=imgwidth+16)
+
 
 secrev_err = False
+if ene_err == True:
+    st.markdown(pow_rev_warn, unsafe_allow_html=True)
 if secrev_pc1+secrev_pc2+secrev_pc3 > 100.0:
     secrev_warn = '<p style="color:Red; font-size: 16px;">The sector revenue % should not be over 100% :)</p>'
     st.markdown(secrev_warn, unsafe_allow_html=True)
@@ -1164,7 +1206,7 @@ else:
             st.metric(label="", value="{:n}".format(c_abs))
             st.write("tonnes")
         with col3:
-            st.write("That's equivalent to... Driving")
+            st.write("That's equivalent to driving")
             st.metric(label="", value="{:n}".format(round(c_abs* 6000/1_000_000)))
             st.write("million km with a diesel car")
         with col4:

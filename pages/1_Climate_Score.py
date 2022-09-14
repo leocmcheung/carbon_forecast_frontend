@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import joblib
+import os
 st.set_page_config(layout="wide")
 
 st.title("Find your company's Climate Strategy Score 🏁")
@@ -468,7 +470,7 @@ with col1:
     revenue = st.number_input('Insert company revenue ($mn)', value=100)
     employees = st.number_input('Insert number of employees', value=2000, step=10)
 with col2:
-    secrev1 = st.selectbox('Sector Revenue #1', secrev_list)
+    secrev1 = st.selectbox('Sector Revenue #1',secrev_list)
     secrev2 = st.selectbox('Sector Revenue #2',secrev_list)
     secrev3 = st.selectbox('Sector Revenue #3',secrev_list)
 
@@ -965,5 +967,15 @@ st.write(X.shape)
 st.write("Waiting for model from Nadir :)")
 c_score = 70
 if 'c_score' not in st.session_state:
-    st.session_state['key'] = c_score
-st.session_state
+    st.session_state['c_score'] = c_score
+st.write("C score placeholder:", st.session_state.c_score)
+
+if st.button('Calculate!'):
+    # tx = joblib.load(os.path.abspath("model/knn_tx.pkl"))
+    # X_tx = tx.transform(X)
+    # pca = joblib.load(os.path.abspath("model/knn_pca.pkl"))
+    # X_pca = pca.transform(X_tx)
+    # model = joblib.load(os.path.abspath("model/knn_km.pkl"))
+    # result = model.predict(X_pca)
+    # st.write(result)
+    st.write("Calculation should appear here")
