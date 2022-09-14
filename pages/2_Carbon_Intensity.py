@@ -528,12 +528,12 @@ secrev_list = ( '', 'Abrasive product manufacturing',
 
 ss = st.session_state
 
+st.header("Basic Metrics of your company")
 
-col1,col2 = st.columns([4,1])
-with col1:
-    st.header("Basic Metrics of your company")
-with col2:
-    preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company",""))
+# col1,col2 = st.columns([4,1])
+# with col1:
+# with col2:
+#     preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company",""))
 
 
 
