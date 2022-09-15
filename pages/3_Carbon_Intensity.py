@@ -61,6 +61,14 @@ CSS = """
 .css-th66yb{
     font-size:24px
 }
+.css-1ec096l{
+    margin-left:-150px
+}
+.benmk{
+    font-style: italic;
+    color:DarkSlateGrey
+}
+
 """
 
 
@@ -1158,22 +1166,25 @@ else:
             cint_img = Image.open(os.path.abspath("images/factory.png"))
             st.image(cint_img,width=imgwidth)
         with col3:
-            st.write("<h3>That's equivalent to driving</h3>", unsafe_allow_html=True)
-            st.metric(label="", value="{:,}".format(round(c_abs* 6000/1_000_000)))
-            st.write("<h3>million km with a diesel car</h3>", unsafe_allow_html=True)
+            st.write("<h3>That's equivalent to</h3>", unsafe_allow_html=True)
+            st.metric(label="", value="{:,}".format(round(c_abs* 2/500)))
+            st.write("<h3>direct flights from Paris to New York</h3>", unsafe_allow_html=True)
         with col3img:
-            cint_img = Image.open(os.path.abspath("images/highway--v2.png"))
+            cint_img = Image.open(os.path.abspath("images/airplane-take-off--v2.png"))
             st.image(cint_img,width=imgwidth)
         with col4:
             st.write("<h3>Or providing electricity for</h3>", unsafe_allow_html=True)
             st.metric(label="", value="{:,}".format(round(c_abs/2.6)))
-            st.write("<h3>homes a year</h3>", unsafe_allow_html=True)
+            st.write("<h3>UK homes a year</h3>", unsafe_allow_html=True)
         with col4img:
             cint_img = Image.open(os.path.abspath("images/wall-socket-with-plug--v1.png"))
             st.image(cint_img,width=imgwidth)
+        st.text("")
+        st.markdown("***")
+        st.write("<h3 class='benmk'>Benchmarking</h3>", unsafe_allow_html=True)
         tst = joblib.load(os.path.abspath("model/benchmk_hc.pkl"))
         tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
-        tst = tst.append({"Carbon Intensity":result[0], "Company Name":"Our Company"}, ignore_index=True).sort_values(by="Carbon Intensity")
+        tst = tst.append({"Carbon Intensity":result[0], "Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Carbon Intensity")
         tst.fillna(59., inplace=True)
         tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
         st.table(tst)

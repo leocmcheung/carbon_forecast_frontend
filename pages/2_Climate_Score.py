@@ -500,6 +500,13 @@ CSS = """
 .css-th66yb{
     font-size:24px;
 }
+.css-1ec096l{
+    margin-left:-150px
+}
+.benmk{
+    font-style: italic;
+    color:DarkSlateGrey
+}
 """
 
 
@@ -1138,10 +1145,12 @@ if st.button('Calculate!'):
     st.session_state['secrev_pc1'] = secrev_pc1
     st.session_state['secrev_pc2'] = secrev_pc2
 
-    # st.session_state
+    st.text("")
+    st.markdown("***")
+    st.write("<h3 class='benmk'>Benchmarking</h3>", unsafe_allow_html=True)
     tst = joblib.load(os.path.abspath("model/benchmk_scr.pkl"))
-    # tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
-    # tst = tst.append({"Carbon Intensity":result[0], "Company Name":"Our Company"}, ignore_index=True).sort_values(by="Carbon Intensity")
-    # tst.fillna(59., inplace=True)
-    # tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
+    tst = tst[["Percentile", "Climate Strategy Score", "Company Name"]]
+    tst = tst.append({"Climate Strategy Score":float(c_score), "Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Climate Strategy Score")
+    tst.fillna(15., inplace=True)
+    tst = tst.style.format({"Percentile":'{:.0f}',"Climate Strategy Score":'{:.2f}'}).hide()
     st.table(tst)
