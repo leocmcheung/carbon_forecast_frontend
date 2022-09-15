@@ -480,13 +480,12 @@ CSS = """
 [data-baseweb="select"] {
     font-size:20px;
     }
-#.css-1bim6c1.effi0qh3 {
-    font-size:14px
-}
 .st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
     font-size:14px;
 }
-
+.css-50ug3q{
+    font-size:30px;
+}
 """
 
 
@@ -525,8 +524,8 @@ if preset == "A Financials company":
     secrevpc2_pre = 27
 elif preset == "An Industrial company":
     sector_pre = 7
-    revenue_pre = 10000
-    employees_pre = 200000
+    revenue_pre = 30000
+    employees_pre = 25000
     secrev1_pre =79
     secrev2_pre = 396
     secrev3_pre = 248
@@ -1079,27 +1078,28 @@ if secrev3 != "":
 # st.write("C score placeholder:", st.session_state.c_score)
 for key in st.session_state.keys():
         del st.session_state[key]
-if st.button('Calculate!'):
-    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
-    X_tx = tx.transform(X)
-    pca = joblib.load(os.path.abspath("model/pca.pkl"))
-    X_pca = pca.transform(X_tx)
-    model = joblib.load(os.path.abspath("model/kmeans.pkl"))
-    result = model.predict(X_pca)
-    df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
-    c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
+# if st.button('Calculate!'):
+tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
+X_tx = tx.transform(X)
+pca = joblib.load(os.path.abspath("model/pca.pkl"))
+X_pca = pca.transform(X_tx)
+model = joblib.load(os.path.abspath("model/kmeans.pkl"))
+result = model.predict(X_pca)
+df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
+c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
 
-    st.session_state['c_score'] = c_score
-    st.write("The Climate Strategy Score for your Company is ", st.session_state.c_score)
+st.session_state['c_score'] = c_score
+
+st.metric(label="The Climate Strategy Score for your Company is",value=st.session_state.c_score)
 
 
-    st.session_state['sector'] = sector
-    st.session_state['revenue'] = revenue
-    st.session_state['employees'] = employees
-    st.session_state['secrev1'] = secrev1
-    st.session_state['secrev2'] = secrev2
-    st.session_state['secrev3'] = secrev3
-    st.session_state['secrev_pc1'] = secrev_pc1
-    st.session_state['secrev_pc2'] = secrev_pc2
+st.session_state['sector'] = sector
+st.session_state['revenue'] = revenue
+st.session_state['employees'] = employees
+st.session_state['secrev1'] = secrev1
+st.session_state['secrev2'] = secrev2
+st.session_state['secrev3'] = secrev3
+st.session_state['secrev_pc1'] = secrev_pc1
+st.session_state['secrev_pc2'] = secrev_pc2
 
     # st.session_state

@@ -1129,14 +1129,14 @@ else:
             st.write("tonnes per $mn revenue")
         with col2:
             st.write("Predicted Carbon Emissions:")
-            st.metric(label="", value="{:n}".format(c_abs))
+            st.metric(label="", value="{:,}".format(c_abs))
             st.write("tonnes")
         with col3:
             st.write("That's equivalent to driving")
-            st.metric(label="", value="{:n}".format(round(c_abs* 6000/1_000_000)))
+            st.metric(label="", value="{:,}".format(round(c_abs* 6000/1_000_000)))
             st.write("million km with a diesel car")
         with col4:
             st.write("Or providing enough electricity for")
-            st.metric(label="", value="{:n}".format(round(c_abs/2.6)))
+            st.metric(label="", value="{:,}".format(round(c_abs/2.6)))
             st.write("homes a year")
 # st.write(st.session_state.key)
