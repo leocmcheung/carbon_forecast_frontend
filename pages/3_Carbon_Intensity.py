@@ -62,7 +62,8 @@ CSS = """
     font-size:24px
 }
 .css-1ec096l{
-    margin-left:-150px
+    margin-left:-150px;
+    margin-right:-150px
 }
 .benmk{
     font-style: italic;
@@ -603,7 +604,6 @@ with col3:
 
 st.text("")
 
-st.text("")
 
 col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
 # with col1:
@@ -1135,13 +1135,14 @@ if secrev2 != "":
     X[secrev2] = secrev_pc2/100
 if secrev3 != "":
     X[secrev3] = secrev_pc3/100
-
+st.markdown("***")
 if secrev_err == True or ene_err == True:
     st.button('Calculate!', disabled=True)
-for i in range(4):
-    st.text("")
+
 else:
     if st.button('Calculate!'):
+        for i in range(3):
+            st.text("")
         tx = joblib.load(txpath)
         X_tx = tx.transform(X)
         pca = joblib.load(pcapath)
@@ -1181,10 +1182,12 @@ else:
             st.image(cint_img,width=imgwidth)
         st.text("")
         st.markdown("***")
-        st.write("<h3 class='benmk'>Benchmarking</h3>", unsafe_allow_html=True)
-        tst = joblib.load(os.path.abspath("model/benchmk_hc.pkl"))
-        tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
-        tst = tst.append({"Carbon Intensity":result[0], "Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Carbon Intensity")
-        tst.fillna(59., inplace=True)
-        tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
-        st.table(tst)
+        if "sector" in ss:
+            if ss.sector == "Health Care":
+                st.write(f"<h3 class='benmk'>Benchmarking: {ss.sector} Sector</h3>", unsafe_allow_html=True)
+                tst = joblib.load(os.path.abspath("model/benchmk_hc.pkl"))
+                tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
+                tst = tst.append({"Carbon Intensity":result[0], "Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Carbon Intensity")
+                tst.fillna(59., inplace=True)
+                tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
+                st.table(tst)

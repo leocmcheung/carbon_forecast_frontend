@@ -4,7 +4,8 @@ import joblib
 import os
 from PIL import Image
 st.set_page_config(page_title="GreenWagon: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
-
+cs_img = Image.open(os.path.abspath("images/climate-care.png"))
+# st.image(cs_img,width=imgwidth)
 st.title("Find your company's climate strategy score")
 
 sector_list = ('','Communication Services',
@@ -501,7 +502,8 @@ CSS = """
     font-size:24px;
 }
 .css-1ec096l{
-    margin-left:-150px
+    margin-left:-150px;
+    margin-right: -150px
 }
 .benmk{
     font-style: italic;
@@ -1099,8 +1101,9 @@ if secrev3 != "":
 # st.write("C score placeholder:", st.session_state.c_score)
 for key in st.session_state.keys():
         del st.session_state[key]
-for i in range(4):
+for i in range(2):
     st.text("")
+st.markdown("***")
 @st.cache
 def load_knn():
     model = joblib.load(os.path.abspath("model/kmeans.pkl"))
@@ -1114,6 +1117,8 @@ def load_knn_pca():
     pca = joblib.load(os.path.abspath("model/pca.pkl"))
     return pca
 if st.button('Calculate!'):
+    for i in range(3):
+        st.text("")
     tx = load_knn_tx()
     X_tx = tx.transform(X)
     pca = load_knn_pca()
@@ -1145,12 +1150,11 @@ if st.button('Calculate!'):
     st.session_state['secrev_pc1'] = secrev_pc1
     st.session_state['secrev_pc2'] = secrev_pc2
 
-    st.text("")
     st.markdown("***")
-    st.write("<h3 class='benmk'>Benchmarking</h3>", unsafe_allow_html=True)
+    st.write("<h3 class='benmk'>Benchmarking: Comparing with the database</h3>", unsafe_allow_html=True)
     tst = joblib.load(os.path.abspath("model/benchmk_scr.pkl"))
-    tst = tst[["Percentile", "Climate Strategy Score", "Company Name"]]
-    tst = tst.append({"Climate Strategy Score":float(c_score), "Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Climate Strategy Score")
+    tst = tst[["Percentile", "Climate Strategy Score", "Selected Company Name"]]
+    tst = tst.append({"Climate Strategy Score":float(c_score), "Selected Company Name":"---Our Company---"}, ignore_index=True).sort_values(by="Climate Strategy Score")
     tst.fillna(15., inplace=True)
-    tst = tst.style.format({"Percentile":'{:.0f}',"Climate Strategy Score":'{:.2f}'}).hide()
+    tst = tst.style.format({"Percentile":'{:.0f}',"Climate Strategy Score":'{:.0f}'}).hide()
     st.table(tst)
