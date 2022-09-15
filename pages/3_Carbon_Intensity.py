@@ -44,7 +44,12 @@ CSS = """
 .st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
     font-size:14px;
 }
-
+.css-1uii870{
+    font-size:30px;
+}
+.css-nojwjo{
+    font-size:26px;
+}
 """
 
 
@@ -1114,6 +1119,8 @@ if secrev3 != "":
 
 if secrev_err == True or ene_err == True:
     st.button('Calculate!', disabled=True)
+for i in range(4):
+    st.text("")
 else:
     if st.button('Calculate!'):
         tx = joblib.load(txpath)
@@ -1122,21 +1129,34 @@ else:
         X_pca = pca.transform(X_tx)
         result = model.predict(X_pca)
         c_abs = round(result[0] * revenue)
-        col1,col2,col3,col4 = st.columns(4)
+        col1,col1img,col2,col2img,col3,col3img,col4,col4img = st.columns([4,2,4,2,4,2,4,2])
         with col1:
-            st.write("Predicted Carbon Intensity for the company: (Scope 1 and Scope 2)")
+            st.write("Predicted Carbon Intensity:")
             st.metric(label="", value="{:.2f}".format(result[0]))
             st.write("tonnes per $mn revenue")
+        with col1img:
+            cint_img = Image.open(os.path.abspath("images/chimney--v1.png"))
+            st.image(cint_img,width=imgwidth)
         with col2:
             st.write("Predicted Carbon Emissions:")
             st.metric(label="", value="{:,}".format(c_abs))
             st.write("tonnes")
+        with col2img:
+            cint_img = Image.open(os.path.abspath("images/factory.png"))
+            st.image(cint_img,width=imgwidth)
         with col3:
             st.write("That's equivalent to driving")
             st.metric(label="", value="{:,}".format(round(c_abs* 6000/1_000_000)))
             st.write("million km with a diesel car")
+        with col3img:
+            cint_img = Image.open(os.path.abspath("images/highway--v2.png"))
+            st.image(cint_img,width=imgwidth)
         with col4:
-            st.write("Or providing enough electricity for")
+            st.write("Or providing electricity for")
             st.metric(label="", value="{:,}".format(round(c_abs/2.6)))
             st.write("homes a year")
-# st.write(st.session_state.key)
+        with col4img:
+            cint_img = Image.open(os.path.abspath("images/wall-socket-with-plug--v1.png"))
+            st.image(cint_img,width=imgwidth)
+        st.write("<<Placeholder for rank comparison>>")
+        st.write("<<Font size needs to be bigger>>")

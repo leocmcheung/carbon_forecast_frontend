@@ -486,6 +486,9 @@ CSS = """
 .css-50ug3q{
     font-size:30px;
 }
+.css-nojwjo{
+    font-size:26px;
+}
 """
 
 
@@ -508,7 +511,7 @@ with st.sidebar.container():
     st.image("images/green-wagon.png")
 
 imgwidth=66
-preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "An IT company - LeWagon!", "Custom"), index=3)
+preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "An Health Care company", "Custom"), index=3)
 col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
 
 
@@ -526,20 +529,20 @@ elif preset == "An Industrial company":
     sector_pre = 7
     revenue_pre = 30000
     employees_pre = 25000
-    secrev1_pre =79
-    secrev2_pre = 396
-    secrev3_pre = 248
-    secrevpc1_pre = 45
-    secrevpc2_pre = 36
-elif preset == "An IT company - LeWagon!":
-    sector_pre = 8
-    revenue_pre = 1000
-    employees_pre = 24000
-    secrev1_pre =194
-    secrev2_pre = 29
-    secrev3_pre = 319
-    secrevpc1_pre = 60
-    secrevpc2_pre = 27
+    secrev1_pre =3
+    secrev2_pre = 318
+    secrev3_pre = 400
+    secrevpc1_pre = 40
+    secrevpc2_pre = 30
+elif preset == "An Health Care company":
+    sector_pre = 6
+    revenue_pre = 40000
+    employees_pre = 25000
+    secrev1_pre =317
+    secrev2_pre = 401
+    secrev3_pre = 400
+    secrevpc1_pre = 90
+    secrevpc2_pre = 5
 else:
     sector_pre = 0
     revenue_pre = 0
@@ -1078,28 +1081,35 @@ if secrev3 != "":
 # st.write("C score placeholder:", st.session_state.c_score)
 for key in st.session_state.keys():
         del st.session_state[key]
-# if st.button('Calculate!'):
-tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
-X_tx = tx.transform(X)
-pca = joblib.load(os.path.abspath("model/pca.pkl"))
-X_pca = pca.transform(X_tx)
-model = joblib.load(os.path.abspath("model/kmeans.pkl"))
-result = model.predict(X_pca)
-df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
-c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
+for i in range(4):
+    st.text("")
+if st.button('Calculate!'):
+    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
+    X_tx = tx.transform(X)
+    pca = joblib.load(os.path.abspath("model/pca.pkl"))
+    X_pca = pca.transform(X_tx)
+    model = joblib.load(os.path.abspath("model/kmeans.pkl"))
+    result = model.predict(X_pca)
+    df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
+    c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
 
-st.session_state['c_score'] = c_score
+    st.session_state['c_score'] = c_score
+    for i in range(3):
+        st.text("")
+    col1,col1img,space = st.columns([5,1,4])
+    with col1:
+        st.metric(label="Estimated Climate Strategy Score for your Company:",value=st.session_state.c_score)
+    with col1img:
+        rate_img = Image.open(os.path.abspath("images/rating.png"))
+        st.image(rate_img, width=96)
 
-st.metric(label="The Climate Strategy Score for your Company is",value=st.session_state.c_score)
-
-
-st.session_state['sector'] = sector
-st.session_state['revenue'] = revenue
-st.session_state['employees'] = employees
-st.session_state['secrev1'] = secrev1
-st.session_state['secrev2'] = secrev2
-st.session_state['secrev3'] = secrev3
-st.session_state['secrev_pc1'] = secrev_pc1
-st.session_state['secrev_pc2'] = secrev_pc2
+    st.session_state['sector'] = sector
+    st.session_state['revenue'] = revenue
+    st.session_state['employees'] = employees
+    st.session_state['secrev1'] = secrev1
+    st.session_state['secrev2'] = secrev2
+    st.session_state['secrev3'] = secrev3
+    st.session_state['secrev_pc1'] = secrev_pc1
+    st.session_state['secrev_pc2'] = secrev_pc2
 
     # st.session_state
