@@ -494,6 +494,12 @@ CSS = """
     font-size:96px;
     text-align: center;
 }
+.css-6nj7z3{
+    font-size:26px;
+}
+.css-th66yb{
+    font-size:24px;
+}
 """
 
 
