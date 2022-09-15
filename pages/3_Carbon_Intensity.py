@@ -1,4 +1,5 @@
 
+from cmath import pi
 import streamlit as st
 import pandas as pd
 import os
@@ -19,7 +20,7 @@ st.set_page_config(page_title="GreenWagon: Tackling Global Warming Step by Step"
 txpath = os.path.abspath("model/tx_norevenue_0914.pkl")
 modelpath = os.path.abspath("model/model_norevenue_0914.json")
 pcapath = os.path.abspath("model/pca_norevenue_0914.pkl")
-st.title("Predict how much annual carbon emission your company has")
+st.title("Predict annual carbon emissions for your company")
 CSS = """
 
 .css-1bim6c1{
@@ -49,6 +50,16 @@ CSS = """
 }
 .css-nojwjo{
     font-size:26px;
+}
+.css-50ug3q{
+    font-size:56px;
+    color:firebrick;
+}
+.css-6nj7z3{
+    font-size:26px
+}
+.css-th66yb{
+    font-size:24px
 }
 """
 
@@ -533,7 +544,7 @@ secrev_list = ( '', 'Abrasive product manufacturing',
 
 ss = st.session_state
 
-st.header("Metrics of your Company")
+st.header("Metrics of your company")
 
 # col1,col2 = st.columns([4,1])
 # with col1:
@@ -545,10 +556,10 @@ st.header("Metrics of your Company")
 col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
 imgwidth = 66
 with col1:
-    sector = st.selectbox("Company Sector:",
+    sector = st.selectbox("Company sector:",
                 sector_list, index=sector_list.index(ss.sector) if "sector" in ss else 0, help="What is your company's GCIS Sector?")
-    revenue = st.number_input('Annual Revenue ($mn)', value=ss.revenue if "revenue" in ss else 0)
-    employees = st.number_input('Number of Employees', value=ss.employees if "employees" in ss else 0, step=10)
+    revenue = st.number_input('Annual revenue ($mn)', value=ss.revenue if "revenue" in ss else 0)
+    employees = st.number_input('Number of employees', value=ss.employees if "employees" in ss else 0, step=10)
 with col1img:
     sec_img = Image.open(os.path.abspath("images/company.png"))
     st.image(sec_img, width=imgwidth)
@@ -560,9 +571,9 @@ with col1img:
     emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
     st.image(emp_img,width=imgwidth)
 with col2:
-    secrev1 = st.selectbox('Sector Revenue #1',secrev_list, index=secrev_list.index(ss.secrev1) if "secrev1" in ss else 0)
-    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev_list.index(ss.secrev2) if "secrev2" in ss else 0)
-    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev_list.index(ss.secrev3) if "secrev3" in ss else 0)
+    secrev1 = st.selectbox('Sector revenue #1',secrev_list, index=secrev_list.index(ss.secrev1) if "secrev1" in ss else 0)
+    secrev2 = st.selectbox('Sector revenue #2',secrev_list, index=secrev_list.index(ss.secrev2) if "secrev2" in ss else 0)
+    secrev3 = st.selectbox('Sector revenue #3',secrev_list, index=secrev_list.index(ss.secrev3) if "secrev3" in ss else 0)
 with col2img:
     sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec1_img, width=imgwidth)
@@ -600,7 +611,7 @@ col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
 #     ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
 #     st.image(ev_img,width=imgwidth)
 with col2:
-    c_score = st.slider('Estimated Climate Strategy Score', 0, 100,
+    c_score = st.slider('Estimated climate strategy score', 0, 100,
             round(float(ss.c_score)) if "c_score" in ss else 50)
 with col2img:
     cs_img = Image.open(os.path.abspath("images/climate-care.png"))
@@ -1128,35 +1139,41 @@ else:
         pca = joblib.load(pcapath)
         X_pca = pca.transform(X_tx)
         result = model.predict(X_pca)
+        c_int = "{:.2f}".format(result[0])
         c_abs = round(result[0] * revenue)
         col1,col1img,col2,col2img,col3,col3img,col4,col4img = st.columns([4,2,4,2,4,2,4,2])
         with col1:
-            st.write("Predicted Carbon Intensity:")
+            col1txt = "<h3>Predicted Carbon Intensity:</h3>"
+            st.write(col1txt, unsafe_allow_html=True)
             st.metric(label="", value="{:.2f}".format(result[0]))
-            st.write("tonnes per $mn revenue")
+            st.write("<h3>tonnes CO2e per $mn revenue</h3>", unsafe_allow_html=True)
         with col1img:
             cint_img = Image.open(os.path.abspath("images/chimney--v1.png"))
             st.image(cint_img,width=imgwidth)
         with col2:
-            st.write("Predicted Carbon Emissions:")
+            st.write("<h3>Predicted Carbon Emissions:</h3>", unsafe_allow_html=True)
             st.metric(label="", value="{:,}".format(c_abs))
-            st.write("tonnes")
+            st.write("<h3>tonnes CO2e</h3>",unsafe_allow_html=True)
         with col2img:
             cint_img = Image.open(os.path.abspath("images/factory.png"))
             st.image(cint_img,width=imgwidth)
         with col3:
-            st.write("That's equivalent to driving")
+            st.write("<h3>That's equivalent to driving</h3>", unsafe_allow_html=True)
             st.metric(label="", value="{:,}".format(round(c_abs* 6000/1_000_000)))
-            st.write("million km with a diesel car")
+            st.write("<h3>million km with a diesel car</h3>", unsafe_allow_html=True)
         with col3img:
             cint_img = Image.open(os.path.abspath("images/highway--v2.png"))
             st.image(cint_img,width=imgwidth)
         with col4:
-            st.write("Or providing electricity for")
+            st.write("<h3>Or providing electricity for</h3>", unsafe_allow_html=True)
             st.metric(label="", value="{:,}".format(round(c_abs/2.6)))
-            st.write("homes a year")
+            st.write("<h3>homes a year</h3>", unsafe_allow_html=True)
         with col4img:
             cint_img = Image.open(os.path.abspath("images/wall-socket-with-plug--v1.png"))
             st.image(cint_img,width=imgwidth)
-        st.write("<<Placeholder for rank comparison>>")
-        st.write("<<Font size needs to be bigger>>")
+        tst = joblib.load(os.path.abspath("model/benchmk_hc.pkl"))
+        tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
+        tst = tst.append({"Carbon Intensity":result[0], "Company Name":"Our Company"}, ignore_index=True).sort_values(by="Carbon Intensity")
+        tst.fillna(59., inplace=True)
+        tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
+        st.table(tst)

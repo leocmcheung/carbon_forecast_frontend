@@ -5,7 +5,7 @@ import os
 from PIL import Image
 st.set_page_config(page_title="GreenWagon: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-st.title("Find your company's Climate Strategy Score 🏁")
+st.title("Find your company's climate strategy score")
 
 sector_list = ('','Communication Services',
  'Consumer Discretionary',
@@ -489,6 +489,11 @@ CSS = """
 .css-nojwjo{
     font-size:26px;
 }
+.score_cls{
+    color:firebrick;
+    font-size:96px;
+    text-align: center;
+}
 """
 
 
@@ -554,10 +559,10 @@ else:
     secrevpc2_pre = round((100-secrevpc1_pre)/2)
 
 with col1:
-    sector = st.selectbox("Company Sector:",
+    sector = st.selectbox("Company sector:",
                 sector_list, index=sector_pre, help="What is your company's GCIS Sector?")
-    revenue = st.number_input('Annual Revenue ($mn)', value=revenue_pre)
-    employees = st.number_input('Number of Employees', value=employees_pre, step=10)
+    revenue = st.number_input('Annual revenue ($mn)', value=revenue_pre)
+    employees = st.number_input('Number of employees', value=employees_pre, step=10)
 
 with col1img:
     sec_img = Image.open(os.path.abspath("images/company.png"))
@@ -570,9 +575,9 @@ with col1img:
     emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
     st.image(emp_img,width=imgwidth)
 with col2:
-    secrev1 = st.selectbox('Sector Revenue #1',secrev_list, index=secrev1_pre)
-    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev2_pre)
-    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev3_pre)
+    secrev1 = st.selectbox('Sector revenue #1',secrev_list, index=secrev1_pre)
+    secrev2 = st.selectbox('Sector revenue #2',secrev_list, index=secrev2_pre)
+    secrev3 = st.selectbox('Sector revenue #3',secrev_list, index=secrev3_pre)
 with col2img:
     sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec1_img, width=imgwidth)
@@ -1083,12 +1088,24 @@ for key in st.session_state.keys():
         del st.session_state[key]
 for i in range(4):
     st.text("")
-if st.button('Calculate!'):
-    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
-    X_tx = tx.transform(X)
-    pca = joblib.load(os.path.abspath("model/pca.pkl"))
-    X_pca = pca.transform(X_tx)
+@st.cache
+def load_knn():
     model = joblib.load(os.path.abspath("model/kmeans.pkl"))
+    return model
+@st.cache
+def load_knn_tx():
+    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
+    return tx
+@st.cache
+def load_knn_pca():
+    pca = joblib.load(os.path.abspath("model/pca.pkl"))
+    return pca
+if st.button('Calculate!'):
+    tx = load_knn_tx()
+    X_tx = tx.transform(X)
+    pca = load_knn_pca()
+    X_pca = pca.transform(X_tx)
+    model = load_knn()
     result = model.predict(X_pca)
     df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
     c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
@@ -1096,12 +1113,15 @@ if st.button('Calculate!'):
     st.session_state['c_score'] = c_score
     for i in range(3):
         st.text("")
-    col1,col1img,space = st.columns([5,1,4])
+    col1,col1img,space = st.columns([7,1,2])
     with col1:
-        st.metric(label="Estimated Climate Strategy Score for your Company:",value=st.session_state.c_score)
+        word = "<h2>Estimated climate strategy score for your company is...</h2>"
+        st.write(word, unsafe_allow_html=True)
+        score = f"<h1 class = 'score_cls'>{st.session_state.c_score}</h1>"
+        st.write(score, unsafe_allow_html=True)
     with col1img:
         rate_img = Image.open(os.path.abspath("images/rating.png"))
-        st.image(rate_img, width=96)
+        st.image(rate_img, width=178)
 
     st.session_state['sector'] = sector
     st.session_state['revenue'] = revenue
@@ -1113,3 +1133,9 @@ if st.button('Calculate!'):
     st.session_state['secrev_pc2'] = secrev_pc2
 
     # st.session_state
+    tst = joblib.load(os.path.abspath("model/benchmk_scr.pkl"))
+    # tst = tst[["Percentile", "Carbon Intensity", "Company Name"]]
+    # tst = tst.append({"Carbon Intensity":result[0], "Company Name":"Our Company"}, ignore_index=True).sort_values(by="Carbon Intensity")
+    # tst.fillna(59., inplace=True)
+    # tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
+    st.table(tst)
