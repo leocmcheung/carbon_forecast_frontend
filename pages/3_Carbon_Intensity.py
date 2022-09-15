@@ -1,12 +1,75 @@
+
 import streamlit as st
 import pandas as pd
-import joblib
 import os
+from xgboost import XGBRegressor
+import numpy as np
+import joblib
+import pickle
+import locale
 from PIL import Image
-st.set_page_config(page_title="CarbonForecast: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-st.title("Find your company's Climate Strategy Score 🏁")
 
+locale.setlocale(locale.LC_ALL, '')
+st.set_page_config(page_title="GreenWagon: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
+
+# filepath = os.path.abspath("model/X_test_tx.csv")
+# modelpath = os.path.abspath("model/test3.sav")
+# ypath = os.path.abspath("model/y_test.csv")
+txpath = os.path.abspath("model/tx_norevenue_0914.pkl")
+modelpath = os.path.abspath("model/model_norevenue_0914.json")
+pcapath = os.path.abspath("model/pca_norevenue_0914.pkl")
+st.title("Predict how much annual carbon emission your company has")
+CSS = """
+
+.css-1bim6c1{
+    font-size:20px;
+}
+.st-af{
+    font-size:18px;
+}
+.css-1inwz65{
+    font-size:18px;
+}
+.css-17ogifi{
+    font-size:18px;
+    top:-28px;
+}
+[data-baseweb="select"] {
+    font-size:20px;
+    }
+#.css-1bim6c1.effi0qh3 {
+    font-size:14px
+}
+.st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
+    font-size:14px;
+}
+
+"""
+
+
+st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+
+with st.sidebar.container():
+    for i in range(25):
+        st.write("")
+    st.image("images/green-wagon.png")
+
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
+## load pickle
+# loaded = XGBRegressor()
+# with open(modelpath,"rb") as f:
+#     loaded = Booster.load_model(f)
+model = XGBRegressor()
+model.load_model(modelpath)
+# loaded = joblib.load(modelpath)
 sector_list = ('','Communication Services',
  'Consumer Discretionary',
  'Consumer Staples',
@@ -462,101 +525,25 @@ secrev_list = ( '', 'Abrasive product manufacturing',
  'Wood container and pallet manufacturing',
  'Wood kitchen cabinet and countertop manufacturing',
  'Wood windows and doors and millwork')
-CSS = """
 
-.css-1bim6c1{
-    font-size:20px;
-}
-.st-af{
-    font-size:18px;
-}
-.css-1inwz65{
-    font-size:18px;
-}
-.css-17ogifi{
-    font-size:18px;
-    top:-28px;
-}
-[data-baseweb="select"] {
-    font-size:20px;
-    }
-#.css-1bim6c1.effi0qh3 {
-    font-size:14px
-}
-.st-c5.st-ci.st-cj.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-ck.st-cl{
-    font-size:14px;
-}
+ss = st.session_state
 
-"""
+st.header("Metrics of your Company")
 
-
-st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+# col1,col2 = st.columns([4,1])
+# with col1:
+# with col2:
+#     preset = st.radio("Preset Portfolios", ("An Industrial company","A Financials company", "An IT company",""))
 
 
 
-
-hide_img_fs = '''
-<style>
-button[title="View fullscreen"]{
-    visibility: hidden;}
-</style>
-'''
-
-st.markdown(hide_img_fs, unsafe_allow_html=True)
-with st.sidebar.container():
-    for i in range(25):
-        st.write("")
-    st.image("images/green-wagon.png")
-
-imgwidth=66
-preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "An IT company - LeWagon!", "Custom"), index=3)
 col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
-
-
-
-if preset == "A Financials company":
-    sector_pre = 5
-    revenue_pre = 3000
-    employees_pre = 40000
-    secrev1_pre =149
-    secrev2_pre = 194
-    secrev3_pre = 234
-    secrevpc1_pre = 60
-    secrevpc2_pre = 27
-elif preset == "An Industrial company":
-    sector_pre = 7
-    revenue_pre = 10000
-    employees_pre = 200000
-    secrev1_pre =79
-    secrev2_pre = 396
-    secrev3_pre = 248
-    secrevpc1_pre = 45
-    secrevpc2_pre = 36
-elif preset == "An IT company - LeWagon!":
-    sector_pre = 8
-    revenue_pre = 1000
-    employees_pre = 24000
-    secrev1_pre =194
-    secrev2_pre = 29
-    secrev3_pre = 319
-    secrevpc1_pre = 60
-    secrevpc2_pre = 27
-else:
-    sector_pre = 0
-    revenue_pre = 0
-    employees_pre = 0
-    secrev1_pre =0
-    secrev2_pre = 0
-    secrev3_pre = 0
-    secrevpc1_pre = 34
-    secrevpc2_pre = round((100-secrevpc1_pre)/2)
-
+imgwidth = 66
 with col1:
     sector = st.selectbox("Company Sector:",
-                sector_list, index=sector_pre, help="What is your company's GCIS Sector?")
-    revenue = st.number_input('Annual Revenue ($mn)', value=revenue_pre)
-    employees = st.number_input('Number of Employees', value=employees_pre, step=10)
-
+                sector_list, index=sector_list.index(ss.sector) if "sector" in ss else 0, help="What is your company's GCIS Sector?")
+    revenue = st.number_input('Annual Revenue ($mn)', value=ss.revenue if "revenue" in ss else 0)
+    employees = st.number_input('Number of Employees', value=ss.employees if "employees" in ss else 0, step=10)
 with col1img:
     sec_img = Image.open(os.path.abspath("images/company.png"))
     st.image(sec_img, width=imgwidth)
@@ -568,9 +555,9 @@ with col1img:
     emp_img = Image.open(os.path.abspath("images/business-conference-female-speaker--v1.png"))
     st.image(emp_img,width=imgwidth)
 with col2:
-    secrev1 = st.selectbox('Sector Revenue #1',secrev_list, index=secrev1_pre)
-    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev2_pre)
-    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev3_pre)
+    secrev1 = st.selectbox('Sector Revenue #1',secrev_list, index=secrev_list.index(ss.secrev1) if "secrev1" in ss else 0)
+    secrev2 = st.selectbox('Sector Revenue #2',secrev_list, index=secrev_list.index(ss.secrev2) if "secrev2" in ss else 0)
+    secrev3 = st.selectbox('Sector Revenue #3',secrev_list, index=secrev_list.index(ss.secrev3) if "secrev3" in ss else 0)
 with col2img:
     sec1_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec1_img, width=imgwidth)
@@ -583,43 +570,96 @@ with col2img:
     sec3_img = Image.open(os.path.abspath("images/tree-structure.png"))
     st.image(sec3_img,width=imgwidth)
 with col3:
-    secrev_pc1 = st.slider("Percentage:", 0, 100, secrevpc1_pre, key="secrev001")
-    secrev_pc2 = st.slider("Percentage:", 0, 100, secrevpc2_pre, key="secrev002")
+    secrev_pc1 = st.slider("Percentage:", 0, 100, ss.secrev_pc1 if "secrev_pc1" in ss else 34, key="secrev001")
+    secrev_pc2 = st.slider("Percentage:", 0, 100, ss.secrev_pc2 if "secrev_pc2" in ss else 34, key="secrev002")
     secrev_pc3 = st.slider("Percentage:", 0, 100, 100-secrev_pc1-secrev_pc2 , key="secrev003")
 
-if sector == "Energy":
-    st.write("(For energy companies only) Revenue % for:")
-    col1,col2,col3,col4,col5,col6,col7 = st.columns(7)
-    with col1:
-        arc_rev = st.number_input("Arctic Drilling %:",step=1.)
-    with col2:
-        coal_rev = st.number_input("Coal %:",step=1.)
-    with col3:
-        nuc_rev = st.number_input("Nuclear %:",step=1.)
-    with col4:
-        oil_rev = st.number_input("Oil & Sands %:",step=1.)
-    with col5:
-        shale_rev = st.number_input("Shale Oil & Gas %:",step=1.)
-    with col6:
-        uds_rev = st.number_input("Ultra Deep Sea Drilling %:",step=1.)
-    with col7:
-        thr_rev = st.number_input("Thermal Coal %:")
-    st.write("Total input % =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2))
-    if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
-        pow_rev_warn = '<p style="color:Red; font-size: 14px;">Total Revenue % should not be over 100% :)</p>'
-        st.markdown(pow_rev_warn, unsafe_allow_html=True)
-        ene_err = True
 
-X=pd.DataFrame({'Sector':[sector],
- 'Employees / Revenue':employees/revenue if revenue!=0 else 0.,
+
+
+st.text("")
+
+st.text("")
+
+col1, col1img, col2, col2img,col3,col3img = st.columns([8,2,8,2,8,2])
+# with col1:
+#     if preset == "An Industrial company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=15000)
+#     elif preset == "A Financials company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=18000)
+#     elif preset == "An IT company":
+#         ev = st.number_input('Enterprise Value ($mn)', value=20000)
+#     else:
+#         ev = st.number_input('Enterprise Value ($mn)', value=5000)
+# with col1img:
+#     ev_img = Image.open(os.path.abspath("images/pie-chart--v2.png"))
+#     st.image(ev_img,width=imgwidth)
+with col2:
+    c_score = st.slider('Estimated Climate Strategy Score', 0, 100,
+            round(float(ss.c_score)) if "c_score" in ss else 50)
+with col2img:
+    cs_img = Image.open(os.path.abspath("images/climate-care.png"))
+    st.image(cs_img,width=imgwidth)
+
+# with col3:
+#     if preset == "An Industrial company":
+#         pe = st.number_input('P/E Ratio', value=11.2)
+#     elif preset == "A Financials company":
+#         pe = st.number_input('P/E Ratio', value=12.6)
+#     elif preset == "An IT company":
+#         pe = st.number_input('P/E Ratio', value=19.8)
+#     else:
+#         pe = st.number_input('P/E Ratio', value=10.0)
+# with col3img:
+#     pe_img = Image.open(os.path.abspath("images/percentage-growth.png"))
+#     st.image(pe_img,width=imgwidth)
+
+
+ene_err = False
+# if sector == "Energy":
+#     st.write("(For energy companies only) Revenue % for:")
+#     col1,col2,col3,col4,col5,col6,col7 = st.columns([1,1,1,1,1,1.2,1])
+
+#     with col1:
+#         arc_rev = st.number_input("Arctic Drilling %:",step=1.)
+#     with col2:
+#         coal_rev = st.number_input("Coal %:",step=1.)
+#     with col3:
+#         nuc_rev = st.number_input("Nuclear %:",step=1.)
+#     with col4:
+#         oil_rev = st.number_input("Oil & Sands %:",step=1.)
+#     with col5:
+#         shale_rev = st.number_input("Shale Oil & Gas %:",step=1.)
+#     with col6:
+#         uds_rev = st.number_input("Ultra Deep Sea Drilling %:",step=1.)
+#     with col7:
+#         thr_rev = st.number_input("Thermal Coal %:")
+#     st.write("Total input % =", round(arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev,2))
+#     if arc_rev +coal_rev+nuc_rev+oil_rev+shale_rev+uds_rev+thr_rev > 100:
+#         pow_rev_warn = '<p style="color:Red; font-size: 14px;">Total Revenue % should not be over 100% :)</p>'
+#         ene_err = True
+
+secrev_err = False
+# if ene_err == True:
+#     st.markdown(pow_rev_warn, unsafe_allow_html=True)
+if secrev_pc1+secrev_pc2+secrev_pc3 > 100.0:
+    secrev_warn = '<p style="color:Red; font-size: 16px;">The sector revenue % should not be over 100% :)</p>'
+    st.markdown(secrev_warn, unsafe_allow_html=True)
+    secrev_err = True
+X = pd.DataFrame({"Sector":[sector],
+                'Employees / Revenue':employees/revenue if revenue!=0 else 0,
+                # 'EV / Revenue':ev/revenue if revenue!=0 else 0,
+                'climate_strategy_score':c_score,
+                'disclosure':0.,
+#  'pe_rat':pe,
  'revenue':revenue,
- 'nuclear_percentage_revenue':nuc_rev  if sector == "Energy" else 0.,
- 'thermal_coal_percentage_revenue':thr_rev if sector == "Energy" else 0.,
- 'ultra_deep_sea_drilling_percentage_revenue':uds_rev  if sector == "Energy" else 0.,
- 'shale_oil_gas_percentage_revenue':shale_rev  if sector == "Energy" else 0.,
- 'coal_percentage_revenue':coal_rev  if sector == "Energy" else 0.,
- 'arctic_drilling_percentage_revenue':arc_rev if sector == "Energy" else 0.,
- 'oil_sands_percentage_revenue':oil_rev if sector == "Energy" else 0.,
+ 'nuclear_percentage_revenue':0.,#nuc_rev if sector == "Energy" else 0.,
+ 'thermal_coal_percentage_revenue':0.,#thr_rev if sector == "Energy" else 0.,
+ 'ultra_deep_sea_drilling_percentage_revenue':0.,#uds_rev if sector == "Energy" else 0.,
+ 'shale_oil_gas_percentage_revenue':0.,#shale_rev if sector == "Energy" else 0.,
+ 'coal_percentage_revenue':0.,#coal_rev if sector == "Energy" else 0.,
+ 'arctic_drilling_percentage_revenue':0.,#arc_rev if sector == "Energy" else 0.,
+ 'oil_sands_percentage_revenue':0.,#oil_rev if sector == "Energy" else 0.,
  'Abrasive product manufacturing':0.,
  'Accounting, tax preparation, bookkeeping, and payroll services':0.,
  'Adhesive manufacturing':0.,
@@ -1064,42 +1104,39 @@ X=pd.DataFrame({'Sector':[sector],
  'Wood container and pallet manufacturing':0.,
  'Wood kitchen cabinet and countertop manufacturing':0.,
  'Wood windows and doors and millwork':0.})
+
 if secrev1 != "":
     X[secrev1] = secrev_pc1/100
 if secrev2 != "":
     X[secrev2] = secrev_pc2/100
 if secrev3 != "":
     X[secrev3] = secrev_pc3/100
-# st.write("The input looks like this", X)
-# st.write(X.shape)
-# st.write("Working the model with Nadir :) - TBC")
-# c_score = 70
-# if 'c_score' not in st.session_state:
-#     st.session_state['c_score'] = c_score
-# st.write("C score placeholder:", st.session_state.c_score)
-for key in st.session_state.keys():
-        del st.session_state[key]
-if st.button('Calculate!'):
-    tx = joblib.load(os.path.abspath("model/col_transf.pkl"))
-    X_tx = tx.transform(X)
-    pca = joblib.load(os.path.abspath("model/pca.pkl"))
-    X_pca = pca.transform(X_tx)
-    model = joblib.load(os.path.abspath("model/kmeans.pkl"))
-    result = model.predict(X_pca)
-    df = joblib.load(os.path.abspath("model/climate_score_stats_per_cluster.pkl"))
-    c_score = "{:.0f}".format(float(df.loc[result,('Climate Score', 'mean')]))
 
-    st.session_state['c_score'] = c_score
-    st.write("The Climate Strategy Score for your Company is ", st.session_state.c_score)
-
-
-    st.session_state['sector'] = sector
-    st.session_state['revenue'] = revenue
-    st.session_state['employees'] = employees
-    st.session_state['secrev1'] = secrev1
-    st.session_state['secrev2'] = secrev2
-    st.session_state['secrev3'] = secrev3
-    st.session_state['secrev_pc1'] = secrev_pc1
-    st.session_state['secrev_pc2'] = secrev_pc2
-
-    # st.session_state
+if secrev_err == True or ene_err == True:
+    st.button('Calculate!', disabled=True)
+else:
+    if st.button('Calculate!'):
+        tx = joblib.load(txpath)
+        X_tx = tx.transform(X)
+        pca = joblib.load(pcapath)
+        X_pca = pca.transform(X_tx)
+        result = model.predict(X_pca)
+        c_abs = round(result[0] * revenue)
+        col1,col2,col3,col4 = st.columns(4)
+        with col1:
+            st.write("Predicted Carbon Intensity for the company: (Scope 1 and Scope 2)")
+            st.metric(label="", value="{:.2f}".format(result[0]))
+            st.write("tonnes per $mn revenue")
+        with col2:
+            st.write("Predicted Carbon Emissions:")
+            st.metric(label="", value="{:n}".format(c_abs))
+            st.write("tonnes")
+        with col3:
+            st.write("That's equivalent to driving")
+            st.metric(label="", value="{:n}".format(round(c_abs* 6000/1_000_000)))
+            st.write("million km with a diesel car")
+        with col4:
+            st.write("Or providing enough electricity for")
+            st.metric(label="", value="{:n}".format(round(c_abs/2.6)))
+            st.write("homes a year")
+# st.write(st.session_state.key)
