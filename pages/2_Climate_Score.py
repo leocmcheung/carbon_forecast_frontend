@@ -511,7 +511,7 @@ with st.sidebar.container():
     st.image("images/green-wagon.png")
 
 imgwidth=66
-preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "An Health Care company", "Custom"), index=3)
+preset = st.radio("Preset Portfolios", ("A Financials company","An Industrial company", "A Health Care company", "Custom"), index=3)
 col1, col1img, col2, col2img,col3 = st.columns([15,3,17,3,8])
 
 
@@ -534,7 +534,7 @@ elif preset == "An Industrial company":
     secrev3_pre = 400
     secrevpc1_pre = 40
     secrevpc2_pre = 30
-elif preset == "An Health Care company":
+elif preset == "A Health Care company":
     sector_pre = 6
     revenue_pre = 40000
     employees_pre = 25000
