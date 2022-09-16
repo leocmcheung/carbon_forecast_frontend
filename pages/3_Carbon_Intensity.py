@@ -9,6 +9,7 @@ import joblib
 import pickle
 import locale
 from PIL import Image
+import time
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -1141,6 +1142,11 @@ if secrev_err == True or ene_err == True:
 
 else:
     if st.button('Calculate!'):
+        my_bar = st.progress(0)
+
+        for percent_complete in range(100):
+            time.sleep(0.025)
+            my_bar.progress(percent_complete + 1)
         for i in range(3):
             st.text("")
         tx = joblib.load(txpath)

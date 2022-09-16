@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import os
 from PIL import Image
+import time
 st.set_page_config(page_title="GreenWagon: Tackling Global Warming Step by Step", page_icon="images/green-wagon.png", layout="wide", initial_sidebar_state="auto", menu_items=None)
 cs_img = Image.open(os.path.abspath("images/climate-care.png"))
 # st.image(cs_img,width=imgwidth)
@@ -1117,6 +1118,11 @@ def load_knn_pca():
     pca = joblib.load(os.path.abspath("model/pca.pkl"))
     return pca
 if st.button('Calculate!'):
+    my_bar = st.progress(0)
+
+    for percent_complete in range(100):
+        time.sleep(0.025)
+        my_bar.progress(percent_complete + 1)
     for i in range(3):
         st.text("")
     tx = load_knn_tx()
