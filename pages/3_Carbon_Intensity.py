@@ -1191,3 +1191,5 @@ else:
                 tst.fillna(59., inplace=True)
                 tst = tst.style.format({"Percentile":'{:.0f}',"Carbon Intensity":'{:.2f}'}).hide()
                 st.table(tst)
+    if st.button (":)"):
+        st.snow()
